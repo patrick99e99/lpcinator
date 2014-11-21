@@ -2,51 +2,64 @@ require 'pry'
 require 'ruby-audio'
 
 module LPC
+  class Config
+    attr_accessor :channels, :window_size, :overlap, :format
+
+    def initialize(options = {})
+      @channels    = options[:channels] || 1
+      @window_size = options[:window_size] || 20
+      @overlap     = options[:overlap] || 5
+      @format      = options[:format] || :float
+    end
+  end
+
   class Generator
-    CHANNELS = 1
-
-    def initialize(input, output, format = :float)
+    def initialize(input, config)
+      @config = config
       @input  = RubyAudio::Sound.open(input)
-      @output = RubyAudio::Sound.open(output, 'w', @input.info.clone)
-      @format = format
-      @number_of_samples = @input.info.length * @input.info.samplerate
+
+      @output = RubyAudio::Sound.open('audio/lol.wav', 'w', @input.info.clone)
     end
 
-    def transform!
-      buffer = reverse(1000)
+    def process!(index = 0, options = {})
+      result = next_window(index, options)
+      buffer = result[:buffer]
 
-      if buffer
-        @output.write(buffer)
-        transform!
-      else
-        @output.close
+      apply_hamming_window(buffer)
+  
+      @output.write(buffer)
+      process!(index + 1, :overlap => true) unless result[:complete]
+    end
+
+    def next_window(index, options)
+      buffer = RubyAudio::Buffer.new(@config.format, frames, @config.channels)
+      position = (@config.window_size - @config.overlap) * index
+      @input.seek(position, IO::SEEK_SET) if options[:overlap] && position < @input.info.frames
+      complete = @input.read(buffer).zero?
+
+      { buffer: buffer, complete: complete }
+    end
+
+    def samplerate
+      @input.info.samplerate 
+    end
+
+    def frames
+      (samplerate / 1000) * @config.window_size
+    end
+
+    def apply_hamming_window(buffer)
+      window_frames = frames - 1
+      @config.window_size.times do |t|
+        break if !buffer[t]
+        window_value = 0.54 - 0.46 * Math.cos(2 * Math::PI * t / window_frames)
+        buffer[t] *= window_value
       end
     end
 
-    def window
-    end
-
-    def reverse(frames)
-      buffer  = @input.read(@format, frames)
-      return if buffer == 0
-
-      reversed = RubyAudio::Buffer.new(@format, frames, CHANNELS)
-
-      index = 0
-      while frames > 0
-        value = buffer[frames - 1]
-        break unless value
-
-        reversed[index] = buffer[frames - 1]
-        puts "#{index} : #{reversed[index]}"
-        index  += 1
-        frames -= 1
-      end
-
-      reversed
-    end
   end
 end
 
-generator = LPC::Generator.new('audio/inc.wav', 'audio/reverse.wav')
-generator.transform!
+config    = LPC::Config.new
+generator = LPC::Generator.new('audio/inc.wav', config)
+generator.process!
