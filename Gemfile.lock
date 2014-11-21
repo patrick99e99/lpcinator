@@ -1,0 +1,17 @@
+GIT
+  remote: https://github.com/warhammerkid/ruby-audio.git
+  revision: 00ef0a198acde2aac6b88a7d389c89b27143b50e
+  specs:
+    ruby-audio (1.6.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    narray (0.6.0.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  narray
+  ruby-audio!
