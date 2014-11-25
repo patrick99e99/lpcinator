@@ -1,13 +1,8 @@
 module LPC
-  class PreEmphasis
-    def initialize(buffer)
-      @buffer = buffer
-    end
-
+  class PreEmphasis < Bufferable
     def process!
-      max_level         = 0
-      sum               = 0
-      number_of_samples = buffer.real_size
+      max_level = 0
+      sum       = 0
 
       number_of_samples.times do |t|
         next if t.zero?
@@ -28,14 +23,10 @@ module LPC
     end
 
     def normalize!(max_level, mean)
-      buffer.real_size.times do |t|
+      number_of_samples.times do |t|
         break if !buffer[t]
         buffer[t] = (buffer[t] - mean) / max_level
       end
     end
-
-    private
-
-    attr_reader :buffer
   end
 end

@@ -1,13 +1,7 @@
 $:.push File.expand_path('./lib')
-require 'ruby-audio'
-require 'config'
-require 'lpc'
 require 'optparse'
 require 'pry'
-require 'waveform'
-require 'pre_emphasis'
-require 'input'
-require 'output'
+require 'lpcinator'
 
 desc 'convert audio file to LPC'
 task :generate do |args|
@@ -59,6 +53,34 @@ task :pre_emphasis do |args|
 
   output     = LPC::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
   output.write!
+
+  seconds    = "%0.4f" % (Time.now.to_f - start_time)
+
+  puts "Successfully processed #{input.info.frames} samples in #{seconds} seconds!"
+
+  exit 0
+end
+
+task :autocorrelate do |args|
+  options = {}
+
+  OptionParser.new(args) do |opts|
+    opts.banner = "Usage: rake generate [options]"
+    opts.on("-i", "--input {audiofile}", "Input audio file", String) do |file|
+      options[:input] = file
+    end
+  end.parse!
+
+  puts "generating pre emphasis file..."
+
+  start_time = Time.now.to_f
+  config     = LPC::Config.new
+
+  input      = LPC::Input.new(:path => options[:input], :config => config)
+  buffer     = input.read
+
+  a   = LPC::Autocorrelation.new(buffer)
+  a.process!
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 
