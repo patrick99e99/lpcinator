@@ -7,11 +7,14 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    coreaudio (0.0.10)
+      narray (~> 0.6.0.0)
     narray (0.6.0.9)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  coreaudio
   narray
   ruby-audio!
