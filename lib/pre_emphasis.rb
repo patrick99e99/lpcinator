@@ -1,44 +1,37 @@
 module LPC
   class PreEmphasis
-    attr_reader :config
-
-    def initialize(input, config)
-      @input  = RubyAudio::Sound.open(input)
-      @config = config
-      @output = RubyAudio::Sound.open('audio/pre_emphasis.wav', 'w', @input.info.clone)
+    def initialize(buffer)
+      @buffer = buffer
     end
 
-    def process!(last_value = nil)
-      frames = 1000
-      buffer = RubyAudio::Buffer.new(config.format, frames, config.channels)
+    def process!
+      max_level = 0
 
-      if sound.read(buffer).zero?
-        @output.close
-        return
-      end
-
-      frames.times do |t|
-        next if t.zero? && !last_value 
+      buffer.real_size.times do |t|
+        next if t.zero?
         break if !buffer[t]
 
-        last_value = t.zero? ? last_value : buffer[t - 1]
-        buffer[t] += last_value * multiplier
+        buffer[t] += buffer[t - 1] * multiplier
+        max_level = buffer[t].abs if buffer[t].abs > max_level
       end
 
-      @output.write(buffer)
-      process!(buffer[frames - 1])
+      normalize!(max_level)
+      buffer
     end
 
     def multiplier
       0.5
     end
 
-    def sound
-      @input
+    def normalize!(max_level)
+      buffer.real_size.times do |t|
+        break if !buffer[t]
+        buffer[t] /= max_level
+      end
     end
 
-    def total_frames
-      @input.info.frames
-    end
+    private
+
+    attr_reader :buffer
   end
 end

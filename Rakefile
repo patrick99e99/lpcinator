@@ -6,6 +6,8 @@ require 'optparse'
 require 'pry'
 require 'waveform'
 require 'pre_emphasis'
+require 'input'
+require 'output'
 
 desc 'convert audio file to LPC'
 task :generate do |args|
@@ -36,20 +38,31 @@ task :pre_emphasis do |args|
 
   OptionParser.new(args) do |opts|
     opts.banner = "Usage: rake generate [options]"
-    opts.on("-f", "--file {audiofile}", "Input audio file", String) do |file|
-      options[:file] = file
+    opts.on("-i", "--input {audiofile}", "Input audio file", String) do |file|
+      options[:input] = file
+    end
+    opts.on("-o", "--output {audiofile}", "Output audio file", String) do |file|
+      options[:output] = file
     end
   end.parse!
 
-  puts "generating linear predictive coding for TMS5220 & friends..."
+  puts "generating pre emphasis file..."
 
   start_time = Time.now.to_f
   config     = LPC::Config.new
-  emphasis   = LPC::PreEmphasis.new(options[:file], config)
+
+  input      = LPC::Input.new(:path => options[:input], :config => config)
+  buffer     = input.read
+
+  emphasis   = LPC::PreEmphasis.new(buffer)
   emphasis.process!
+
+  output     = LPC::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
+  output.write!
+
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 
-  puts "Successfully processed #{emphasis.total_frames} samples in #{seconds} seconds!"
+  puts "Successfully processed #{input.info.frames} samples in #{seconds} seconds!"
 
   exit 0
 end
