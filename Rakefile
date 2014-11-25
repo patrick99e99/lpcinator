@@ -1,7 +1,15 @@
+$:.push File.expand_path('.')
 $:.push File.expand_path('./lib')
+
 require 'optparse'
 require 'pry'
+require 'rspec/core/rake_task'
+require_relative 'spec/spec_helper'
 require 'lpcinator'
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
 
 task :pre_emphasis do |args|
   options = {}

@@ -1,8 +1,8 @@
 module LPCinator
-  module Table
+  module CodingTable
     extend self
 
-    CODING = [
+    COEFFICIENTS = [
       [-32158,-31968,-31840,-31744,-31616,-31488,-31327,-31039,-30720,-30464,-30176,-29854,-29535,-29152,-28703,-28223,-27213,-25373,-23023,-20089,-16528,-12354,-7654,-2595,2591,7651,12351,16526,20087,23021,25372,27212],
       [-21730,-20172,-18452,-16569,-14526,-12332,-10002,-7554,-5014,-2411,222,2854,5448,7975,10404,12713,14882,16898,18754,20446,21977,23352,24577,25663,26621,27461,28195,28835,29390,29870,30285,31824],
       [-29906,-26454,-23003,-19551,-16099,-12648,-9196,-5745,-2293,1157,4609,8060,11512,14964,18415,21867],
@@ -15,12 +15,12 @@ module LPCinator
       [-15447,-10766,-6085,-1404,3274,7958,12638,17320],
     ]
 
-    def closest_value_for(coefficient, value)
-      table = CODING[coefficient - 1]
+    def closest_value_for(k, value)
+      table = COEFFICIENTS[k - 1]
       table.each_with_index do |coefficient, index|
         if coefficient > value
           previous_coefficient = table[index - 1]
-          if coefficient - value < previous_coefficient - value
+          if coefficient - value < value - previous_coefficient 
             return coefficient
           else
             return previous_coefficient
