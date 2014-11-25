@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class Generator
     def initialize(input, config)
       @config = config

@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class Config
     attr_accessor :channels, :window_size, :overlap, :format
 

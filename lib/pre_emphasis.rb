@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class PreEmphasis < Bufferable
     def process!
       max_level = 0

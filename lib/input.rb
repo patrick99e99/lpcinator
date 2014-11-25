@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class Input
     def initialize(options)
       @sound  = RubyAudio::Sound.open(options.fetch(:path))

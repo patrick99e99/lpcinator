@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class Bufferable
     def initialize(buffer)
       @buffer = buffer

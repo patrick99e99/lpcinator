@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   module Table
     extend self
 

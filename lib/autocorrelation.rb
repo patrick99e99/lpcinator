@@ -1,4 +1,4 @@
-module LPC
+module LPCinator
   class Autocorrelation < Bufferable
     def process!
       a0  = a_for(0)

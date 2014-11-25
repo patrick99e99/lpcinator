@@ -3,30 +3,6 @@ require 'optparse'
 require 'pry'
 require 'lpcinator'
 
-desc 'convert audio file to LPC'
-task :generate do |args|
-  options = {}
-
-  OptionParser.new(args) do |opts|
-    opts.banner = "Usage: rake generate [options]"
-    opts.on("-f", "--file {audiofile}", "Audio file to convert to LPC", String) do |file|
-      options[:file] = file
-    end
-  end.parse!
-
-  puts "generating linear predictive coding for TMS5220 & friends..."
-
-  start_time = Time.now.to_f
-  config     = LPC::Config.new
-  generator  = LPC::Generator.new(options[:file], config)
-  generator.process!
-  seconds    = "%0.4f" % (Time.now.to_f - start_time)
-
-  puts "Successfully processed #{generator.total_frames} samples in #{seconds} seconds!"
-
-  exit 0
-end
-
 task :pre_emphasis do |args|
   options = {}
 
@@ -43,15 +19,15 @@ task :pre_emphasis do |args|
   puts "generating pre emphasis file..."
 
   start_time = Time.now.to_f
-  config     = LPC::Config.new
+  config     = LPCinator::Config.new
 
-  input      = LPC::Input.new(:path => options[:input], :config => config)
+  input      = LPCinator::Input.new(:path => options[:input], :config => config)
   buffer     = input.read
 
-  emphasis   = LPC::PreEmphasis.new(buffer)
+  emphasis   = LPCinator::PreEmphasis.new(buffer)
   emphasis.process!
 
-  output     = LPC::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
+  output     = LPCinator::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
   output.write!
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
@@ -74,12 +50,12 @@ task :autocorrelate do |args|
   puts "generating pre emphasis file..."
 
   start_time = Time.now.to_f
-  config     = LPC::Config.new
+  config     = LPCinator::Config.new
 
-  input      = LPC::Input.new(:path => options[:input], :config => config)
+  input      = LPCinator::Input.new(:path => options[:input], :config => config)
   buffer     = input.read
 
-  a   = LPC::Autocorrelation.new(buffer)
+  a   = LPCinator::Autocorrelation.new(buffer)
   a.process!
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
