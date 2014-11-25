@@ -17,8 +17,9 @@ class Waveform
     number_of_samples.times do |t|
       degree += 1
       value = frequency.inject(0) do |accumulator, freq|
-        sine = ("%.16f" % Math.sin(2 * Math::PI * degree * freq / samplerate)).to_f
-        accumulator += sine * amplitude / frequency.size
+        formula = 2 * Math::PI * freq * degree / (samplerate.to_f)
+        sine = Math.sin(formula)
+        accumulator += (sine * amplitude / frequency.size) 
       end
       buffer[t] = value
     end
