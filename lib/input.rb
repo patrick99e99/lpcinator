@@ -1,8 +1,9 @@
 module LPCinator
   class Input
     def initialize(options)
-      @sound  = RubyAudio::Sound.open(options.fetch(:path))
-      @config = options.fetch(:config)
+      @sound    = RubyAudio::Sound.open(options.fetch(:path))
+      @format   = options.fetch(:format, :float)
+      @channels = options.fetch(:channels, 1)
     end
 
     def info
@@ -19,7 +20,7 @@ module LPCinator
 
     def read
       move_playhead_to 0
-      RubyAudio::Buffer.new(config.format, total_frames, config.channels).tap do |buffer|
+      RubyAudio::Buffer.new(format, total_frames, channels).tap do |buffer|
         sound.read(buffer)
       end
     end
@@ -30,7 +31,7 @@ module LPCinator
       sound.seek(frame, IO::SEEK_SET)
     end
 
-    attr_reader :sound, :config
+    attr_reader :sound, :format, :channels
   end
 end
 
