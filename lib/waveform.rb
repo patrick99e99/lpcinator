@@ -1,6 +1,6 @@
 class Waveform
-  attr_accessor :samplerate, :duration, :phase, :amplitude, :frequency, :channels, :output
-  
+  attr_reader :samplerate, :duration, :phase, :amplitude, :frequency, :channels, :output
+
   def initialize(options = {})
     @samplerate = options[:samplerate] || 44100
     @duration   = options[:duration]   || 1000
@@ -28,21 +28,17 @@ class Waveform
     file.close
   end
 
-  def number_of_samples
-    (duration / 1000) * samplerate
-  end
-
-  def amplitude
-    @amplitude / 100.0
-  end
-
-  def info
+  def description
     { :samplerate => samplerate,
       :duration   => duration,
       :phase      => phase,
       :amplitude  => amplitude,
       :frequency  => frequency,
       :channels   => channels }
+  end
+
+  def number_of_samples
+    (duration / 1000) * samplerate
   end
 
 private
@@ -56,5 +52,10 @@ private
     )
     @file ||= RubyAudio::Sound.open(output, 'w', info) 
   end
+  
+  def amplitude
+    @amplitude / 100.0
+  end
+
 end
 

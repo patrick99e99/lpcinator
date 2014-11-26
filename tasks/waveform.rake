@@ -25,10 +25,12 @@ task :waveform do |args|
     end
   end.parse!
 
+  start_time = Time.now.to_f
   waveform = Waveform.new(options)
-  puts "Creating waveform at #{waveform.output} with #{waveform.info}"
+  puts "Creating waveform at #{waveform.output} with #{waveform.description}"
   waveform.generate!
-  puts "Success!"
+  seconds = "%0.4f" % (Time.now.to_f - start_time)
+  puts "Success! Generated #{waveform.number_of_samples} in #{seconds} seconds"
 
   exit 0
 end
