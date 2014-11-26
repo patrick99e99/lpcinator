@@ -44,13 +44,14 @@ class Waveform
 private
 
   def file
-    return @file if @file
-    info = RubyAudio::SoundInfo.new(
-      :channels => channels, 
-      :samplerate => samplerate, 
-      :format => RubyAudio::FORMAT_WAV|RubyAudio::FORMAT_PCM_32,
-    )
-    @file ||= RubyAudio::Sound.open(output, 'w', info) 
+    @file ||= begin
+      info = RubyAudio::SoundInfo.new(
+        :channels => channels, 
+        :samplerate => samplerate, 
+        :format => RubyAudio::FORMAT_WAV|RubyAudio::FORMAT_PCM_32,
+      )
+      RubyAudio::Sound.open(output, 'w', info) 
+    end
   end
   
   def amplitude
