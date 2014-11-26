@@ -18,6 +18,7 @@ module LPCinator
     def closest_value_for(k, value)
       table = COEFFICIENTS[k - 1]
       table.each_with_index do |coefficient, index|
+        return coefficient if index.zero? && value < coefficient 
         if coefficient > value
           previous_coefficient = table[index - 1]
           if coefficient - value < value - previous_coefficient 
