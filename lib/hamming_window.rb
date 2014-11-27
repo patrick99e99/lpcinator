@@ -25,7 +25,7 @@ module LPCinator
     def window
       @window ||= [].tap do |window|
         frames.times do |t|
-          window[t] = 0.54 - 0.46 * Math.cos(2 * Math::PI * t / frames - 1)
+          window[t] = 0.54 - 0.46 * Math.cos(2 * Math::PI * t / (frames - 1))
         end
       end
     end
