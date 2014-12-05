@@ -15,20 +15,20 @@ module LPCinator
       [-15447,-10766,-6085,-1404,3274,7958,12638,17320],
     ]
 
-    def closest_value_for(k, value)
+    def reflection_coefficient_for(k, value)
       table = COEFFICIENTS[k - 1]
       table.each_with_index do |coefficient, index|
-        return coefficient if index.zero? && value < coefficient 
+        return 0 if index.zero? && value < coefficient 
         if coefficient > value
           previous_coefficient = table[index - 1]
           if coefficient - value < value - previous_coefficient 
-            return coefficient
+            return index
           else
-            return previous_coefficient
+            return index - 1
           end
         end
       end
-      table.last
+      table.length - 1
     end
   end
 end
