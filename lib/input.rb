@@ -1,9 +1,9 @@
 module LPCinator
   class Input
-    def initialize(options)
-      @sound    = RubyAudio::Sound.open(options.fetch(:path))
-      @type     = options.fetch(:type, :float)
-      @channels = options.fetch(:channels, 1)
+    def initialize(config)
+      @sound    = RubyAudio::Sound.open(config.fetch(:path))
+      @type     = config.fetch(:type, :float)
+      @channels = config.fetch(:channels, 1)
     end
 
     def info

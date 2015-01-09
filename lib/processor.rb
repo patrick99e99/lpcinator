@@ -1,44 +1,52 @@
 module LPCinator
   class Processor
+    FRAME_SIZE = 25
 
-    def initialize(options)
-      input = Input.new(options)
-      @buffer = input.read
-      @index  = 0
+    def self.generate_lpc(path)
+      puts new(:path => path).lpc_hex_bytes
+    end
 
-      pre_emphasis(buffer)
-      hamming_window(buffer)
-      frames = autocorrelation(buffer)
+    def initialize(config)
+      @input = Input.new(config)
+    end
 
-      output_hex_byte_stream(frames)
+    def lpc_hex_bytes
+      LPCinator::HexByteStreamer.translate(frame_data)
+    end
+
+    def frame_data
+      [].tap do |frame_data|
+        segmenter.each_segment do |segment|
+          LPCinator::HammingWindow.process!(segment)
+          frame_data << LPCinator::Autocorrelator.frame_data_for(segment)
+        end
+
+        perform_pitch_detection_for!(frame_data)
+      end
     end
 
     private
 
-    def next_frames
+    def pre_emphasized_buffer
+      @pre_emphasized_buffer ||= begin
+        input.read.tap { |buffer| LPCinator::PreEmphasis.process!(buffer) }
+      end
     end
 
-    def pre_emphasis(buffer)
-      processor = PreEmphasis.new(buffer)
-      processor.process!
-    end
-
-    def hamming_window(buffer)
-      processor = HammingWindow.new(buffer, {
-        :samplerate => 8000,
-        :size => 25,
-        :overlap => 0,
+    def segmenter
+      @segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, { 
+        samplerate: input.samplerate, 
+        size_in_milliseconds: FRAME_SIZE 
       })
-      processor.process!
     end
 
-    def autocorrelation(buffer)
-      processor = Autocorrelation.new(buffer)
-      processor.process!
+    def perform_pitch_detection_for!(frame_data)
+      frame_data.each do |frame|
+        frame[:pitch] = 32
+      end
     end
 
-    def output_hex_byte_stream(frames)
-      puts HexByteStreamer.process!(frames)
-    end
+    attr_reader :input
   end
 end
+

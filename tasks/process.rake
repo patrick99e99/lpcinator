@@ -13,11 +13,11 @@ task :process do |args|
 
   start_time = Time.now.to_f
 
-  LPCinator::Processor.process! 'audio/inc.wav'
+  LPCinator::Processor.generate_lpc 'audio/inc.wav'
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 
-  puts "Successfully processed #{input.info.frames} samples in #{seconds} seconds!"
+  puts "Successfully created LPC in #{seconds} seconds!"
 
   exit 0
 end

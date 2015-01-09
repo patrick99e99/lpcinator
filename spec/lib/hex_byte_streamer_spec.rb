@@ -13,9 +13,9 @@ describe LPCinator::HexByteStreamer do
     ]
   }
 
-  subject { described_class.process!(frames) }
+  subject { described_class.translate(frames) }
 
-  it 'converts frame data into hex' do
+  it 'translates frame data into hex bytes' do
     expect(subject).to eq '09,a8,cd,cc,02,16,58,54,0a,aa,d6,55,6b,d3,8b,69,d1,05,aa,17,f0'
   end
 end

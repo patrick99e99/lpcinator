@@ -17,8 +17,7 @@ module LPCinator::HexByteStreamer
     :k10 => 3,
   }
 
-  def process!(frames)
-    puts frames
+  def translate(frames)
     bit_patterns = bit_patterns_for(frames)
     reversed_hex_bytes_from(bit_patterns).join(',')
   end
