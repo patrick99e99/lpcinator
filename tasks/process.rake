@@ -13,7 +13,7 @@ task :process do |args|
 
   start_time = Time.now.to_f
 
-  LPCinator::Processor.generate_lpc 'audio/inc.wav'
+  LPCinator::Processor.generate_lpc options[:input]
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 
