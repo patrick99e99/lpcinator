@@ -1,9 +1,5 @@
 module LPCinator
   class Segmenter < Bufferable
-    def each_buffer(config, &block)
-      new(config).each_buffer(block)
-    end
-
     def initialize(buffer, config)
       @buffer            = buffer
       @number_of_samples = config.fetch(:samplerate) / 1000 * config.fetch(:size_in_milliseconds)
