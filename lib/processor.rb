@@ -15,13 +15,21 @@ module LPCinator
     end
 
     def frame_data
-      [].tap do |frame_data|
+      [].tap do |data|
         segmenter.each_segment do |segment|
           LPCinator::HammingWindow.process!(segment)
-          frame_data << LPCinator::Autocorrelator.frame_data_for(segment)
-        end
 
-        perform_pitch_detection_for!(frame_data)
+          autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
+          reflection_coefficients      = LPCinator::Reflector.translate(autocorrelation_coefficients)
+          energy                       = Random.rand(15) + 1
+
+          entry = LPCinator::FrameDataBuilder.create_for(reflection_coefficients, energy)
+          entry[:pitch] = Random.rand(64)
+          entry[:repeat] = 0
+
+puts entry[:k1]
+          data << entry
+        end
       end
     end
 
@@ -38,12 +46,6 @@ module LPCinator
         samplerate: input.samplerate, 
         size_in_milliseconds: FRAME_SIZE 
       })
-    end
-
-    def perform_pitch_detection_for!(frame_data)
-      frame_data.each do |frame|
-        frame[:pitch] = 32
-      end
     end
 
     attr_reader :input
