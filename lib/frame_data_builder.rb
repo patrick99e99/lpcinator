@@ -2,14 +2,15 @@ module LPCinator
   module FrameDataBuilder
     extend self
 
-    def create_for(reflection_coefficients, energy)
+    def create_for(parameters)
       {}.tap do |frame_data|
-        frame_data[:gain] = energy
-        return frame_data unless reflection_coefficients
+        return frame_data unless parameters
+        frame_data[:gain] = parameters.rms
 
         10.times do |t|
           k = t + 1
-          frame_data[key_for(k)] = LPCinator::CodingTable.index_for_closest_value(k, reflection_coefficients[k])
+puts "k#{k}: #{parameters.k[k]}"
+          frame_data[key_for(k)] = LPCinator::CodingTable.index_for_closest_value(k, parameters.k[k])
         end
       end
     end

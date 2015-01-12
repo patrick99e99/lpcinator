@@ -20,16 +20,20 @@ module LPCinator
           LPCinator::HammingWindow.process!(segment)
 
           autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
-          reflection_coefficients      = LPCinator::Reflector.translate(autocorrelation_coefficients)
-          energy                       = Random.rand(15) + 1
+          parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
 
-          entry = LPCinator::FrameDataBuilder.create_for(reflection_coefficients, energy)
-          entry[:pitch] = Random.rand(64)
+          entry = LPCinator::FrameDataBuilder.create_for(parameters)
+          entry[:pitch] = 22
           entry[:repeat] = 0
+puts entry
+return
 
-puts entry[:k1]
           data << entry
         end
+
+data.each_with_index do |hash, idx|
+  puts "#{idx} #{hash}"
+end
       end
     end
 

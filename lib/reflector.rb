@@ -1,70 +1,60 @@
 module LPCinator
   class Reflector
+    class Parameters
+      attr_reader :k, :rms
+
+      def initialize(params)
+        @k   = params.fetch(:k)
+        @rms = params.fetch(:rms)
+      end
+    end
 
     def self.translate(coefficients)
       new(coefficients).translate
     end
 
     def initialize(coefficients)
-      @autocorrelation_coefficients = coefficients
+      @r = coefficients
     end
 
     def translate
-      return if r[0] == 0
+      return if r.first.zero?
 
-      fk[1]  = r[1] / r[0]
-      b[1]   = r[1]
-      rms[1] = r[0] - (fk[1] * r[1])
+      k, b, d = new_array, new_array, new_array
+
+      k[1] = -r[1] / r[0]
+      d[1] = r[1]
+      d[2] = r[0] + (k[1] * r[1])
 
       i = 2
       while i <= 10
         y = r[i]
-        delay = y
+        b[1] = y
 
         j = 1
         while j <= i - 1
-          fnext = b[j] - (fk[j] * y)
-          y = y - (fk[j] * b[j])
-          b[j] = delay
-          delay = fnext
+          b[j + 1] = d[j] + (k[j] * y)
+          y = y + (k[j] * d[j])
+          d[j] = b[j]
           j += 1
         end
 
-        b[i] = delay
-        fk[i] = y / rms[i - 1]
-        rms[i] = rms[i - 1] - (fk[i] * y)
+        k[i] = -y / d[i]
+        d[i + 1] = d[i] + (k[i] * y)
+        d[i] = b[i]
         i += 1
       end
 
-puts fk[1]
-      fk
+      Parameters.new(k: k, rms: d.last)
     end
 
-    def fk
-      @fk ||= [nil]
+  private
+
+    def new_array
+      Array.new(1)
     end
 
-    def b
-      @b ||= [nil]
-    end
-
-    def rms
-      @rms ||= [nil]
-    end
-
-    def bim1
-      @bim1 ||= [nil]
-    end
-
-    def bi
-      @bi ||= [nil]
-    end
-
-    def r
-      autocorrelation_coefficients
-    end
-
-    attr_reader :autocorrelation_coefficients
+    attr_reader :r
   end
 end
 
