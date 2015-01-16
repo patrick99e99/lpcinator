@@ -2,12 +2,13 @@ module LPCinator
   class Processor
     FRAME_SIZE = 25
 
-    def self.generate_lpc(path)
-      puts new(:path => path).lpc_hex_bytes
+    def self.generate_lpc(path, options = {})
+      puts new(path, options).lpc_hex_bytes
     end
 
-    def initialize(config)
-      @input = Input.new(config)
+    def initialize(path, options = {})
+      @input   = Input.new({ :path => path })
+      @options = options
     end
 
     def lpc_hex_bytes
@@ -16,24 +17,22 @@ module LPCinator
 
     def frame_data
       [].tap do |data|
-        segmenter.each_segment do |segment|
+        segmenter.each_segment_with_index do |segment, index|
+
           LPCinator::HammingWindow.process!(segment)
 
           autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
           parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
 
           entry = LPCinator::FrameDataBuilder.create_for(parameters)
-          entry[:pitch] = 22
+          entry[:pitch] = options[:pitch].to_i
+          entry[:gain]  = options[:gain].to_i
           entry[:repeat] = 0
-puts entry
-return
 
           data << entry
-        end
 
-data.each_with_index do |hash, idx|
-  puts "#{idx} #{hash}"
-end
+          puts "#{index} #{entry}"
+        end
       end
     end
 
@@ -52,7 +51,7 @@ end
       })
     end
 
-    attr_reader :input
+    attr_reader :input, :options
   end
 end
 
