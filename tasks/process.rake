@@ -1,4 +1,4 @@
-desc 'lpc generation'
+desc 'generates frame data and hex LPC for TMS5220'
 task :process do |args|
   options = {}
 
@@ -13,6 +13,10 @@ task :process do |args|
 
     opts.on("-g", "--gain {gain for frames}", "Gain for frames", String) do |gain|
       options[:gain] = gain
+    end
+
+    opts.on("-f", "--frame-size {size in milliseconds}", "Frame size in ms", String) do |frame_size|
+      options[:frame_size] = frame_size
     end
   end.parse!
 

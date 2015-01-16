@@ -8,7 +8,7 @@ module LPCinator
     end
 
     def frames(file, options)
-      puts frames_for(file, options)
+      frames_for(file, options)
     end
 
     private
@@ -17,17 +17,18 @@ module LPCinator
       file = File.read(file)
 
       [].tap do |frames|
+        lines = []
         file.each_line do |line|
-          next if line.strip.length.zero? || !!(line =~ /[a-z*;]/i)
-
+          lines << line unless line.strip.length.zero? || !!(line =~ /[a-z*;]/i)
+        end
+        
+        lines.compact.each_with_index do |line, index|
           values = line.scan(/\d+/).map(&:to_i)
           frame  = {}
 
-          frame[:gain]   = modified_value(values[1], options[:gain])
-          frame[:gain]   = 0 if frame[:gain] < 0
+          frame[:gain]   = modified_value(values[1], options[:gain], 15)
           frame[:repeat] = values[2] if values[2] 
-          frame[:pitch]  = modified_value(values[3], options[:pitch]) if values[3]
-          frame[:pitch]  = 0 if frame[:pitch] && frame[:pitch] < 0
+          frame[:pitch]  = modified_value(values[3], options[:pitch], 63) if values[3]
           frame[:k1]     = values[4] if values[4]
           frame[:k2]     = values[5] if values[5]
           frame[:k3]     = values[6] if values[6]
@@ -39,25 +40,25 @@ module LPCinator
           frame[:k9]     = values[12] if values[12]
           frame[:k10]    = values[13] if values[13]
 
-          raise "invalid pitch value! must be between 0 and 64" if frame[:pitch] && frame[:pitch] > 64
-          raise "invalid gain value! must be between 0 and 16"  if frame[:gain] && frame[:gain] > 16
-
+          puts "#{frame},"
           frames << frame
         end
       end
     end
 
-    def modified_value(value, optional)
+    def modified_value(value, optional, max)
       return value unless optional
       override = optional.to_i.abs
 
       if /\+/ =~ optional
-        value + override
+        value += override
       elsif /-/ =~ optional
-        value - override
+        value -= override
       else
-        override
+        value = override
       end
+
+      value > max ? max : value
     end
   end
 end
