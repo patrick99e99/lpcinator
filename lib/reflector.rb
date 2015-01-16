@@ -20,7 +20,9 @@ module LPCinator
     def translate
       return if r.first.zero?
 
-      k, b, d = new_array, new_array, new_array
+      # Leroux Guegen algorithm for finding K's
+
+      k, b, d = [], [], []
 
       k[1] = -r[1] / r[0]
       d[1] = r[1]
@@ -49,10 +51,6 @@ module LPCinator
     end
 
   private
-
-    def new_array
-      Array.new(1)
-    end
 
     attr_reader :r
   end
