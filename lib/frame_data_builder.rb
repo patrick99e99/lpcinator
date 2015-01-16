@@ -9,7 +9,6 @@ module LPCinator
 
         10.times do |t|
           k = t + 1
-puts "k#{k}: #{parameters.k[k]}"
           frame_data[key_for(k)] = LPCinator::CodingTable.index_for_closest_value(k, parameters.k[k])
         end
       end

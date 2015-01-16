@@ -5,7 +5,7 @@ module LPCinator
     end
 
     def coefficients
-      11.times.map { |t| puts "a#{t}: #{a_for(t)}"; a_for(t) }
+      11.times.map { |t| a_for(t) }
     end
 
   private
