@@ -4,8 +4,16 @@ module LPCinator
       new(buffer).coefficients
     end
 
+    def self.sum_of_squares_for(buffer)
+      new(buffer).sum_of_squares
+    end
+
     def coefficients
       11.times.map { |t| a_for(t) }
+    end
+
+    def sum_of_squares 
+      a_for(0)
     end
 
   private

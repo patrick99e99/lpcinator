@@ -25,24 +25,42 @@ module LPCinator
         lines.compact.each_with_index do |line, index|
           values = line.scan(/\d+/).map(&:to_i)
           frame  = {}
-
-          frame[:gain]   = modified_value(values[1], options[:gain], 15)
-          frame[:repeat] = values[2] if values[2] 
-          frame[:pitch]  = modified_value(values[3], options[:pitch], 63) if values[3]
-          frame[:k1]     = values[4] if values[4]
-          frame[:k2]     = values[5] if values[5]
-          frame[:k3]     = values[6] if values[6]
-          frame[:k4]     = values[7] if values[7]
-          frame[:k5]     = values[8] if values[8]
-          frame[:k6]     = values[9] if values[9]
-          frame[:k7]     = values[10] if values[10]
-          frame[:k8]     = values[11] if values[11]
-          frame[:k9]     = values[12] if values[12]
-          frame[:k10]    = values[13] if values[13]
+          [:gain, :repeat, :pitch, :k1, :k2, :k3, :k4, :k5, :k6, :k7, :k8, :k9, :k10].each do |key|
+            value = value_for(key, values, options)
+            frame[key] = value if value
+          end
 
           puts "#{frame},"
           frames << frame
         end
+      end
+    end
+
+    def value_for(key, values, options)
+      case key
+      when :gain
+        value = values[1]
+        if options[:translate]
+          LPCinator::CodingTable::VALUES[:rms][value]
+        else
+          modified_value(value, options[:gain], 15)
+        end
+      when :repeat
+        values[2] if values[2]
+      when :pitch
+        value = values[3]
+        return unless value
+        if options[:translate]
+          LPCinator::CodingTable::VALUES[:pitch][value]
+        else
+          modified_value(value, options[:pitch], 63)
+        end
+      when /k(\d)/
+        index = $1.to_i - 1
+        value = values[4 + index]
+        return unless value
+
+        options[:translate] ? LPCinator::CodingTable::VALUES[:ks][index][value] : value
       end
     end
 

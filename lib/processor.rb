@@ -7,7 +7,7 @@ module LPCinator
     end
 
     def self.frames(path, options = {})
-      new(path, options).frame_data
+      new(path, options).normalized_frame_data
     end
 
     def initialize(path, options = {})
@@ -16,28 +16,11 @@ module LPCinator
     end
 
     def lpc_hex_bytes
-      LPCinator::HexByteStreamer.translate(frame_data)
+      LPCinator::HexByteStreamer.translate(normalized_frame_data)
     end
 
-    def frame_data
-      [].tap do |data|
-        segmenter.each_segment_with_index do |segment, index|
-
-          LPCinator::HammingWindow.process!(segment)
-
-          autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
-          parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
-
-          entry = LPCinator::FrameDataBuilder.create_for(parameters)
-          entry[:pitch]  = options[:pitch].to_i
-          entry[:gain]   = options[:gain].to_i
-          entry[:repeat] = 0
-
-          data << entry
-
-          puts "#{index} #{entry}"
-        end
-      end
+    def normalized_frame_data
+      @normalized_frame_data ||= FrameDataGainNormalizer.normalize!(frame_data)
     end
 
     private
@@ -57,6 +40,22 @@ module LPCinator
 
     def frame_size
       (options[:frame_size] && options[:frame_size].to_i) || DEFAULT_FRAME_SIZE 
+    end
+
+    def frame_data
+      [].tap do |data|
+        segmenter.each_segment_with_index do |segment, index|
+          LPCinator::HammingWindow.process!(segment)
+
+          autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
+          parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
+
+          entry = LPCinator::FrameDataBuilder.create_for(segment, parameters, pitch, options)
+
+          data << entry
+          puts entry
+        end
+      end
     end
 
     attr_reader :input, :options

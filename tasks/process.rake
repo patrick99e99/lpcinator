@@ -18,6 +18,10 @@ task :process do |args|
     opts.on("-f", "--frame-size {size in milliseconds}", "Frame size in ms", String) do |frame_size|
       options[:frame_size] = frame_size
     end
+
+    opts.on("-t", "--translate", "Translate K values", String) do |translate|
+      options[:translate] = true
+    end
   end.parse!
 
   puts "generating LPC data..."

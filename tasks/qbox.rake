@@ -8,12 +8,16 @@ task :qbox do |args|
       options[:input] = file
     end
 
-    opts.on("-p", "--pitch {pitch for frames", "Pitch for frames", String) do |pitch|
+    opts.on("-p", "--pitch {pitch for frames}", "Pitch for frames", String) do |pitch|
       options[:pitch] = pitch
     end
 
-    opts.on("-g", "--gain {gain for frames", "Gain for frames", String) do |gain|
+    opts.on("-g", "--gain {gain for frames}", "Gain for frames", String) do |gain|
       options[:gain] = gain
+    end
+
+    opts.on("-t", "--translate", "Translate parameters", String) do |translate|
+      options[:translate] = true
     end
   end.parse!
 
