@@ -260,7 +260,7 @@ module LPCinator
           parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
 
           idx = (1.2530864197530864 * index).round
-          pitch = options[:whisper] ? 0 : overrides[idx][:pitch]
+          pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : overrides[idx][:pitch])
 
           entry = LPCinator::FrameDataBuilder.create_for(segment, parameters, pitch, options)
 
