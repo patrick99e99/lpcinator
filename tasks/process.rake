@@ -22,6 +22,10 @@ task :process do |args|
     opts.on("-t", "--translate", "Translate K values", String) do |translate|
       options[:translate] = true
     end
+
+    opts.on("-w", "--whisper", "Whisper speech", String) do |whisper|
+      options[:whisper] = true
+    end
   end.parse!
 
   puts "generating LPC data..."
