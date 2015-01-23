@@ -11,19 +11,20 @@ module LPCinator
     end
 
     def low_pass!
-      last_filter = 0
-
       number_of_samples.times do |t|
         last_buffer        = t.zero? ? 0 : buffer[t - 1]
         buffer_before_last = t <= 1  ? 0 : buffer[t - 2]
 
-        filter      = coefficient_1 * buffer[t] + coefficient_2 * last_filter
-        buffer[t]   = coefficient_3 * filter + coefficient_4 * last_buffer * coefficient_5 * buffer_before_last
-        last_filter = filter
+        self.filter = coefficient_1 * buffer[t] + coefficient_2 * filter
+        buffer[t]   = coefficient_3 * filter + coefficient_4 * last_buffer + coefficient_5 * buffer_before_last
       end
     end
 
   private
+
+    def filter
+      @filter || 0
+    end
 
     def alpha_1
       @alpha_1 ||= 0.3572 * 2 * Math::PI * cutoff
@@ -58,6 +59,7 @@ module LPCinator
     end
 
     attr_reader :cutoff, :time
+    attr_writer :filter
   end
 end
 
