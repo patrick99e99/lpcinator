@@ -17,8 +17,8 @@ module LPCinator
         last_buffer        = t.zero? ? 0 : buffer[t - 1]
         buffer_before_last = t <= 1  ? 0 : buffer[t - 2]
 
-        filter      = filter_coefficients[0] * buffer[t] + filter_coefficients[1] * last_filter
-        buffer[t]   = filter_coefficients[2] * filter + filter_coefficients[3] * last_buffer * filter_coefficients[4] * buffer_before_last
+        filter      = coefficient_1 * buffer[t] + coefficient_2 * last_filter
+        buffer[t]   = coefficient_3 * filter + coefficient_4 * last_buffer * coefficient_5 * buffer_before_last
         last_filter = filter
       end
     end
@@ -35,12 +35,6 @@ module LPCinator
 
     def beta
       @beta ||= 0.8938 * Math::PI * cutoff
-    end
-
-    def filter_coefficients
-      @filter_coefficients ||= 5.times.map do |t|
-        send("coefficient_#{t + 1}".to_sym)
-      end
     end
 
     def coefficient_1
@@ -64,7 +58,6 @@ module LPCinator
     end
 
     attr_reader :cutoff, :time
-
   end
 end
 
