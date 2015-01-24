@@ -1,7 +1,8 @@
 module LPCinator
   class Reflector
     class Parameters
-      attr_reader :k, :rms
+      attr_accessor :rms
+      attr_reader :k
 
       def initialize(params)
         @k   = params.fetch(:k)
@@ -9,12 +10,13 @@ module LPCinator
       end
     end
 
-    def self.translate(coefficients)
-      new(coefficients).translate
+    def self.translate(coefficients, number_of_samples)
+      new(coefficients, number_of_samples).translate
     end
 
-    def initialize(coefficients)
-      @r = coefficients
+    def initialize(coefficients, number_of_samples)
+      @r                 = coefficients
+      @number_of_samples = number_of_samples
     end
 
     def translate
@@ -47,12 +49,16 @@ module LPCinator
         i += 1
       end
 
-      Parameters.new(k: k, rms: d.last)
+      Parameters.new(k: k, rms: formatted_rms(d.last))
     end
 
   private
 
-    attr_reader :r
+    def formatted_rms(rms)
+      Math.sqrt(rms / number_of_samples) * (1 << 15)
+    end
+
+    attr_reader :r, :number_of_samples
   end
 end
 

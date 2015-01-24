@@ -2,11 +2,11 @@ module LPCinator
   module FrameDataBuilder
     extend self
 
-    def create_for(segment, parameters, pitch, options = {})
+    def create_for(parameters, pitch, options = {})
       {}.tap do |frame_data|
         translate = !!options[:translate]
 
-        frame_data[:gain]  = closest_gain_match_for(segment, parameters.rms, translate)
+        frame_data[:gain] = closest_gain_match_for(parameters.rms, translate)
         next if frame_data[:gain].zero?
 
         frame_data[:repeat] = 0
@@ -26,10 +26,9 @@ module LPCinator
       "k#{k}".to_sym
     end
 
-    def closest_gain_match_for(segment, rms, translate)
-      formatted_rms = Math.sqrt(rms / segment.real_size) * (1 << 15)
+    def closest_gain_match_for(rms, translate)
       values = LPCinator::CodingTable.rms
-      LPCinator::ClosestValueFinder.index_or_translated_value(formatted_rms, values, translate)
+      LPCinator::ClosestValueFinder.index_or_translated_value(rms, values, translate)
     end
 
     def closest_k_match_for(k, actual, translate)

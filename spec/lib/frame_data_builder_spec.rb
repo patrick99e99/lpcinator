@@ -2,13 +2,12 @@ require 'spec_helper'
 
 describe LPCinator::FrameDataBuilder do
   describe '#create_for' do
-    let(:segment)    { RubyAudio::Buffer.new(:float, 4, 8) }
     let(:parameters) { LPCinator::Reflector::Parameters.new(:k => ks, :rms => rms) }
     let(:ks)         { [nil] + 10.times.map { -1.0 } }
-    let(:rms)        { 0.5 }
+    let(:rms)        { 1000 }
     let(:pitch)      { 32 }
     let(:options)    { {} }
-    subject          { described_class.create_for(segment, parameters, pitch, options) }
+    subject          { described_class.create_for(parameters, pitch, options) }
 
     context 'when the pitch is greater than zero' do
       specify do

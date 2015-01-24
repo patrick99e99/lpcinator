@@ -2,12 +2,14 @@ module LPCinator
   class Processor
     DEFAULT_FRAME_SIZE = 25
 
-    def self.generate_lpc(path, options = {})
-      puts new(path, options).lpc_hex_bytes
+    def self.byte_stream(path, options = {})
+      puts new(path, options).byte_stream
     end
 
-    def self.frames(path, options = {})
-      new(path, options).normalized_frame_data
+    def self.frame_data(path, options = {})
+      new(path, options).frame_data.each_with_index do |frame, index|
+        puts "#{index}: #{frame}"
+      end
     end
 
     def initialize(path, options = {})
@@ -15,12 +17,17 @@ module LPCinator
       @options = options
     end
 
-    def lpc_hex_bytes
-      LPCinator::HexByteStreamer.translate(normalized_frame_data)
+    def byte_stream
+      LPCinator::HexByteStreamer.translate(frame_data)
     end
 
-    def normalized_frame_data
-      @normalized_frame_data ||= FrameDataGainNormalizer.normalize!(frame_data)
+    def frame_data
+      parameters_with_normalized_rms.each_with_index.map do |parameters, index|
+        idx = (1.2530864197530864 * index).round
+        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : overrides[idx][:pitch])
+
+        LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
+      end
     end
 
     private
@@ -251,23 +258,17 @@ module LPCinator
       (options[:frame_size] && options[:frame_size].to_i) || DEFAULT_FRAME_SIZE 
     end
 
-    def frame_data
-      [].tap do |data|
-        segmenter.each_segment_with_index do |segment, index|
-          LPCinator::HammingWindow.process!(segment)
+    def parameters
+      @parameters ||= segmenter.each_segment do |segment, number_of_samples|
+        LPCinator::HammingWindow.process!(segment)
 
-          autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
-          parameters                   = LPCinator::Reflector.translate(autocorrelation_coefficients)
-
-          idx = (1.2530864197530864 * index).round
-          pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : overrides[idx][:pitch])
-
-          entry = LPCinator::FrameDataBuilder.create_for(segment, parameters, pitch, options)
-
-          data << entry
-          puts entry
-        end
+        autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
+        LPCinator::Reflector.translate(autocorrelation_coefficients, number_of_samples)
       end
+    end
+
+    def parameters_with_normalized_rms
+      @parameters_with_normalized_rms ||= LPCinator::RMSNormalizer.normalize!(parameters)
     end
 
     attr_reader :input, :options
