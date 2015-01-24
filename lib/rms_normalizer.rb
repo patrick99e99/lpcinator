@@ -6,6 +6,10 @@ module LPCinator
       new(parameters_for_all_frames).normalize!
     end
 
+    def self.max_index
+      LPCinator::CodingTable::RMS[0..PEAK_RMS_INDEX].length - 1
+    end
+
     def initialize(parameters_for_all_frames)
       @parameters_for_all_frames = parameters_for_all_frames
     end

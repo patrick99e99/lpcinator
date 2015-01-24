@@ -8,7 +8,7 @@ module LPCinator
 
     def self.frame_data(path, options = {})
       new(path, options).frame_data.each_with_index do |frame, index|
-        puts "#{index}: #{frame}"
+        puts "#{index}: #{frame}" 
       end
     end
 
@@ -24,13 +24,20 @@ module LPCinator
     def frame_data
       parameters_with_normalized_rms.each_with_index.map do |parameters, index|
         idx = (1.2530864197530864 * index).round
-        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : overrides[idx][:pitch])
+        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[idx])
 
-        LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
-      end
+        frame = LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
+        frame if (options[:unvoiced]  && frame[:pitch] && frame[:pitch].zero?) ||
+                 (options[:voiced]    && frame[:pitch] && !frame[:pitch].zero?) ||
+                 (!options[:unvoiced] && !options[:voiced])
+      end.compact
     end
 
     private
+
+    def pitch_table
+      overrides.map { |o| o[:pitch] }
+    end
 
     def overrides
       [
