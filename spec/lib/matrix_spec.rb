@@ -15,7 +15,7 @@ describe LPCinator::Matrix do
     end
   end
 
-  describe '[y,x]' do
+  describe 'accessing elements' do
     subject { described_class.new(:rows => 2, :columns => 2, :values => [[0,1],[2,3]]) }
 
     specify { expect(subject[0,0]).to be_nil }
@@ -26,6 +26,16 @@ describe LPCinator::Matrix do
     specify { expect(subject[2,1]).to eq(2) }
     specify { expect(subject[2,2]).to eq(3) }
     specify { expect(subject[2,3]).to be_nil }
+  end
+
+  describe 'setting elements' do
+    subject { described_class.new(:rows => 2, :columns => 2, :values => [[0,1],[2,3]]) }
+
+    specify do
+      subject[1,1] = 4
+      expect(subject).to eq([[4,1],
+                             [2,3]])
+    end
   end
 
   describe 'vertical columns' do

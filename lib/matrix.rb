@@ -44,11 +44,15 @@ module LPCinator
       @elements ||= rows.map(&:columns)
     end
 
-    def [](y,x)
+    def [](y, x)
       return nil if y < 1 || y > elements.size
       return nil if x < 1 || x > elements.first.size
 
       elements[y - 1][x - 1]
+    end
+
+    def []=(y, x, value)
+      rows[y - 1][x, :do_not_notify => true] = value 
     end
 
     def row_at_column(column)
