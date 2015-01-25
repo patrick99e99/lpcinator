@@ -2,7 +2,7 @@ module LPCinator
   class Segmenter < Bufferable
     def initialize(buffer, config)
       @buffer            = buffer
-      @number_of_samples = config.fetch(:samplerate) / 1000 * config.fetch(:size_in_milliseconds)
+      @number_of_samples = buffer.sample_rate / 1000 * config.fetch(:size_in_milliseconds)
     end
 
     def each_segment
@@ -22,7 +22,7 @@ module LPCinator
   private
 
     def new_buffer
-      RubyAudio::Buffer.new(buffer.type, number_of_samples, buffer.channels)
+      LPCinator::Buffer.new(number_of_samples, buffer.sample_rate)
     end
 
     def number_of_segments

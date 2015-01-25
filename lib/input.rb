@@ -1,9 +1,7 @@
 module LPCinator
   class Input
-    def initialize(config)
-      @sound    = RubyAudio::Sound.open(config.fetch(:path))
-      @type     = config.fetch(:type, :float)
-      @channels = config.fetch(:channels, 1)
+    def initialize(path)
+      @sound = RubyAudio::Sound.open(path)
     end
 
     def info
@@ -14,13 +12,13 @@ module LPCinator
       info.frames
     end
 
-    def samplerate
+    def sample_rate
       info.samplerate 
     end
 
     def read
       move_playhead_to 0
-      RubyAudio::Buffer.new(type, total_frames, channels).tap do |buffer|
+      LPCinator::Buffer.new(total_frames, sample_rate).tap do |buffer|
         sound.read(buffer)
       end
     end

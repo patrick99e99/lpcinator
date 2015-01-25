@@ -13,7 +13,7 @@ module LPCinator
     end
 
     def initialize(path, options = {})
-      @input   = Input.new({ :path => path })
+      @input   = Input.new(path)
       @options = options
     end
 
@@ -255,10 +255,7 @@ module LPCinator
     end
 
     def segmenter
-      @segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, { 
-        samplerate: input.samplerate, 
-        size_in_milliseconds: frame_size,
-      })
+      @segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, size_in_milliseconds: frame_size)
     end
 
     def frame_size

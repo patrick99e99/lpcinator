@@ -6,8 +6,8 @@ task :waveform do |args|
     opts.banner = "Usage: rake test_waveform [options]"
     [
       { :output => "Output file for test waveform" },
-      { :samplerate => "Sample rate" },
-      { :duration => "Length of signal" },
+      { :sample_rate => "Sample rate" },
+      { :duration => "Length of signal in ms" },
       { :phase => "Phase shift of signal" },
       { :amplitude => "Amplitude of signal" },
       { :frequency => "Frequency in hz" },
@@ -26,11 +26,11 @@ task :waveform do |args|
   end.parse!
 
   start_time = Time.now.to_f
-  waveform = Waveform.new(options)
+  waveform = LPCinator::Waveform.new(options)
   puts "Creating waveform at #{waveform.output} with #{waveform.description}"
   waveform.generate!
   seconds = "%0.4f" % (Time.now.to_f - start_time)
-  puts "Success! Generated #{waveform.number_of_samples} in #{seconds} seconds"
+  puts "Success! Generated #{waveform.number_of_samples} samples in #{seconds} seconds"
 
   exit 0
 end

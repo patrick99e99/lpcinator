@@ -1,20 +1,6 @@
 require 'ruby-audio'
 require 'bufferable' 
-require 'waveform'
-require 'pre_emphasis'
-require 'input'
-require 'output'
-require 'autocorrelator'
-require 'reflector'
-require 'closest_value_finder'
-require 'coding_table'
-require 'hamming_window'
-require 'hex_byte_streamer'
-require 'segmenter'
-require 'frame_data_builder'
-require 'parameter_modifier'
-require 'rms_normalizer'
-require 'processor'
-require 'qbox_frame_parser'
-require 'chebychev'
-require 'matrix'
+
+Dir.glob('lib/*.rb').each do |file|
+  require file.split(/\/([^.]+)\./)[1]
+end
