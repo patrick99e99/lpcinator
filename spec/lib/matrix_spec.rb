@@ -32,9 +32,21 @@ describe LPCinator::Matrix do
     subject { described_class.new(:rows => 2, :columns => 2, :values => [[0,1],[2,3]]) }
 
     specify do
-      subject[1,1] = 4
-      expect(subject).to eq([[4,1],
+      subject[1,1] = subject[2,2]
+      expect(subject).to eq([[3,1],
                              [2,3]])
+    end
+
+    describe 'from scratch' do
+      subject { described_class.new(:rows => 2, :columns => 2) }
+
+      specify do
+        subject[1,1] = 1
+        subject[1,2] = nil
+        subject[2,2] = 4
+        expect(subject).to eq([[1,0],
+                               [0,4]])
+      end
     end
   end
 

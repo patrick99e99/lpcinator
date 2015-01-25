@@ -14,7 +14,7 @@ module LPCinator
       end
 
       def []=(index, options = {}, value)
-        columns[index - 1] = value
+        columns[index - 1] = value || 0
         delegate.row_element_was_updated(column, columns) unless options[:do_not_notify]
       end
 
@@ -28,10 +28,10 @@ module LPCinator
 
       number_of_rows    = attrs.fetch(:rows)
       number_of_columns = attrs.fetch(:columns)
-      values            = attrs.fetch(:values)
+      values            = attrs[:values] || []
 
       number_of_rows.times do |index|
-        values_for_row = values[index].is_a?(Array) ? values[index] : number_of_columns.times.map { values[index] }
+        values_for_row = values[index].is_a?(Array) ? values[index] : number_of_columns.times.map { values[index] || 0 }
         @rows << Row.new(values_for_row)
       end
     end
