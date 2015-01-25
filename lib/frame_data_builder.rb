@@ -11,7 +11,7 @@ module LPCinator
         frame_data[:repeat] = 0
         frame_data[:pitch]  = pitch || 0
 
-        frame_data[:gain] = closest_gain_match_for(parameters.rms, translate, options)
+        frame_data[:gain] = closest_gain_match_for(parameters.rms, translate)
         next if frame_data[:gain].zero?
         modify_gain_from_options!(frame_data, options)
 
@@ -29,8 +29,7 @@ module LPCinator
       "k#{k}".to_sym
     end
 
-    def closest_gain_match_for(rms, translate, options)
-      optional = options[:unvoiced_gain]
+    def closest_gain_match_for(rms, translate)
       values = LPCinator::CodingTable.rms
       LPCinator::ClosestValueFinder.index_or_translated_value(rms, values, translate)
     end

@@ -27,7 +27,7 @@ module LPCinator
         pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[idx])
 
         frame = LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
-        frame if (options[:unvoiced]  && frame[:pitch] && frame[:pitch].zero?) ||
+        frame if (options[:unvoiced]  && frame[:pitch] && frame[:pitch].zero?)  ||
                  (options[:voiced]    && frame[:pitch] && !frame[:pitch].zero?) ||
                  (!options[:unvoiced] && !options[:voiced])
       end.compact
