@@ -8,9 +8,9 @@ end
 
 require 'optparse'
 require 'pry'
+require 'lpcinator'
 require 'rspec/core/rake_task'
 require 'spec/spec_helper'
-require 'lpcinator'
 
 RSpec::Core::RakeTask.new(:spec)
 

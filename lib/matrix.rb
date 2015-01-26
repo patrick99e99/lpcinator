@@ -18,6 +18,10 @@ module LPCinator
         delegate.row_element_was_updated(column, columns) unless options[:do_not_notify]
       end
 
+      def [](index)
+        columns[index - 1]
+      end
+
       private
 
       attr_reader :delegate, :column
@@ -64,6 +68,10 @@ module LPCinator
       rows.each_with_index do |row, index|
         row[column, :do_not_notify => true] = columns[index]
       end
+    end
+
+    def to_s
+      elements.inspect
     end
 
   private

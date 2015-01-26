@@ -23,8 +23,7 @@ module LPCinator
 
     def frame_data
       parameters_with_normalized_rms.each_with_index.map do |parameters, index|
-        idx = (1.2530864197530864 * index).round
-        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[idx])
+        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[index])
 
         frame = LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
         frame if (options[:unvoiced]  && frame[:pitch] && frame[:pitch].zero?)  ||
@@ -36,7 +35,11 @@ module LPCinator
     private
 
     def pitch_table
-      overrides.map { |o| o[:pitch] }
+#      overrides.map { |o| o[:pitch] }
+
+      @pitch_table ||= pitch_segmenter.each_segment do |segment|
+        LPCinator::PitchDetector.pitch_for_period(segment)
+      end
     end
 
     def overrides
@@ -256,6 +259,10 @@ module LPCinator
 
     def segmenter
       @segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, size_in_milliseconds: frame_size)
+    end
+
+    def pitch_segmenter
+      @pitch_segmenter ||= LPCinator::Segmenter.new(input.read, size_in_milliseconds: frame_size)
     end
 
     def frame_size
