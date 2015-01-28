@@ -60,6 +60,16 @@ describe LPCinator::FrameDataBuilder do
       end
     end
 
+    context 'when the pitch is not zero' do
+      context 'and k1 is positive' do
+        before { ks[1] = 0.001 }
+
+        it 'should be considered unvoiced' do
+          expect(subject[:pitch]).to eq 0
+        end
+      end
+    end
+
     context 'when the values should be translated' do
       let(:options) { { :translate => true } }
       specify do

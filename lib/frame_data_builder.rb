@@ -9,7 +9,7 @@ module LPCinator
         translate = !!options[:translate]
 
         frame_data[:repeat] = 0
-        frame_data[:pitch]  = closest_pitch_match_for(pitch, translate)
+        frame_data[:pitch]  = closest_pitch_match_for(pitch, parameters.k[1], translate)
 
         frame_data[:gain] = closest_gain_match_for(parameters.rms, translate)
         next if frame_data[:gain].zero?
@@ -29,7 +29,8 @@ module LPCinator
       "k#{k}".to_sym
     end
 
-    def closest_pitch_match_for(pitch, translate)
+    def closest_pitch_match_for(pitch, k1, translate)
+      return 0 if k1 >= 0
       values = LPCinator::CodingTable.pitch
       LPCinator::ClosestValueFinder.index_or_translated_value(pitch, values, translate)
     end
