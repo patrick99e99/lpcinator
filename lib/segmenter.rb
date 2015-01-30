@@ -2,7 +2,7 @@ module LPCinator
   class Segmenter < Bufferable
     def initialize(buffer, config)
       @buffer            = buffer
-      @number_of_samples = buffer.sample_rate / 1000 * config.fetch(:size_in_milliseconds)
+      @number_of_samples = (buffer.sample_rate / 1000 * config.fetch(:size_in_milliseconds)).floor
     end
 
     def each_segment
@@ -15,8 +15,14 @@ module LPCinator
           segment[t] = sample
         end
 
-        yield segment, segment.real_size
+        segments << segment
+
+        yield segment, index, segment.real_size
       end
+    end
+
+    def segments
+      @segments ||= []
     end
 
   private
