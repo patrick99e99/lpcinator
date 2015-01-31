@@ -52,7 +52,7 @@ namespace :process do
   task :byte_stream do |args|
     options = parse_options(args)
 
-    puts "generating LPC hex byte stream..."
+    print "generating LPC hex byte stream"
 
     start_time = Time.now.to_f
 
@@ -72,7 +72,7 @@ namespace :process do
       end
     end
 
-    puts "generating LPC frame data..."
+    print "generating LPC frame data..."
 
     start_time = Time.now.to_f
 

@@ -3,10 +3,12 @@ module LPCinator
     DEFAULT_FRAME_SIZE = 25
 
     def self.byte_stream(path, options = {})
+      puts
       puts new(path, options).byte_stream
     end
 
     def self.frame_data(path, options = {})
+      puts
       new(path, options).frame_data.each_with_index do |frame, index|
         puts "#{index}: #{frame}" 
       end
@@ -35,10 +37,10 @@ module LPCinator
     private
 
     def pitch_table
-#      overrides.map { |o| o[:pitch] }
-
-      @pitch_table ||= pitch_segmenter.each_segment do |segment|
-        LPCinator::PitchDetector.pitch_for_period(segment)
+      @pitch_table ||= pitch_segmenter.each_segment do |segment, index|
+        pre_emphasized_segment = pre_emphasized_segmenter.segments[index]
+        #LPCinator::PitchEstimator.pitch_for_period(segment, pre_emphasized_segment)
+        100
       end
     end
 
@@ -257,12 +259,12 @@ module LPCinator
       end
     end
 
-    def segmenter
-      @segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, size_in_milliseconds: frame_size)
+    def pre_emphasized_segmenter
+      @pre_emphasized_segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, size_in_milliseconds: frame_size)
     end
 
     def pitch_segmenter
-      @pitch_segmenter ||= LPCinator::Segmenter.new(input.read, size_in_milliseconds: frame_size)
+      @pitch_segmenter ||= LPCinator::Segmenter.new(input.read, size_in_milliseconds: frame_size, window_size: 2)
     end
 
     def frame_size
@@ -270,7 +272,7 @@ module LPCinator
     end
 
     def parameters
-      @parameters ||= segmenter.each_segment do |segment, number_of_samples|
+      @parameters ||= pre_emphasized_segmenter.each_segment do |segment, index, number_of_samples|
         LPCinator::HammingWindow.process!(segment)
 
         autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)

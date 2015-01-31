@@ -9,5 +9,9 @@ module LPCinator
       @sample_rate = sample_rate
       super(TYPE, number_of_samples, CHANNELS)
     end
+
+    def energy
+      LPCinator::Autocorrelator.sum_of_squares_for(self)
+    end
   end
 end

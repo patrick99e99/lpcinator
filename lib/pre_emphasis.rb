@@ -9,7 +9,7 @@ module LPCinator
     def process!
       max_level  = 0
       sum        = 0
-      pre_energy = energy
+      pre_energy = buffer.energy
 
       number_of_samples.times do |t|
         next if t.zero?
@@ -20,7 +20,7 @@ module LPCinator
         sum += buffer[t]
       end
 
-      scale = scale_for(pre_energy, energy)
+      scale = scale_for(pre_energy, buffer.energy)
       mean  = sum / number_of_samples
       max_level -= mean
       normalize!(max_level, mean, 1)
@@ -36,10 +36,6 @@ module LPCinator
 
     def scale_for(pre_energy, post_energy)
       Math.sqrt(pre_energy / post_energy)
-    end
-
-    def energy
-      LPCinator::Autocorrelator.sum_of_squares_for(buffer)
     end
   end
 end
