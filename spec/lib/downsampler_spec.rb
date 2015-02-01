@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe LPCinator::Downsampler do
 
-  let(:groups)             { 3 }
+  let(:groups)             { 5 }
   let(:numbers)            { 6 }
   let(:number_of_samples)  { groups * numbers }
   let(:sample_rate)        { 44100 }
@@ -23,19 +23,26 @@ describe LPCinator::Downsampler do
   before do
     allow(LPCinator::Chebychev).to receive(:low_pass!)
   end
-  let(:ratio) { sample_rate.to_f / target_sample_rate.to_f }
-  let(:frac)  { ratio - ratio.floor }
-  let(:group_1) { 1 + 2 + 3 + 4 + 5 + (frac * 6) }
-  let(:group_2) { ((1 - frac) * 6) + 1 + 2 + 3 + 4 + (frac * 5) }
-  let(:group_3) { ((1 - frac) * 5) + 6 + 1 + 2 + 3 + (frac * 4) }
-  let(:group_4) { ((1 - frac) * 4) + 5 + 6 }
+  let(:ratio)   { sample_rate.to_f / target_sample_rate.to_f }
+  let(:frac1)   { ratio - ratio.floor }
+  let(:frac2)   { (frac1 * 2) - (frac1 * 2).floor }
+  let(:frac3)   { (frac1 * 3) - (frac1 * 3).floor }
+  let(:frac4)   { (frac1 * 4) - (frac1 * 4).floor }
+  let(:group_1) { (1 + 2 + 3 + 4 + (4 + frac1 * (5 - 4))) / ratio }
+  let(:group_2) { ((4 + (1 - frac1) * (5-4)) + 6 + 1 + 2 + 3 + (3 + frac2 * (4 - 3))) / ratio }
+  let(:group_3) { ((3 + (1 - frac2) * (4-3)) + 5 + 6 + 1 + 2 + (2 + frac3 * (3 - 2))) / ratio }
+  let(:group_4) { ((2 + (1 - frac3) * (3-2)) + 4 + 5 + 6 + 1 + (1 + frac4 * (2 - 1))) / ratio }
 
   specify do
     expect(LPCinator::Chebychev).to receive(:low_pass!).with(buffer, 4, 0.1)
 
-    expect(subject[0]).to be_within(group_1 / 5.0).of(0.005)
-    expect(subject[1]).to be_within(group_2 / 5.0).of(0.005)
-    expect(subject[2]).to be_within(group_3 / 5.0).of(0.005)
-    expect(subject[3]).to be_within(group_4).of(0.005)
+    puts
+    4.times do |t|
+      puts subject.inspect
+    end
+    expect(subject[0]).to be_within(0.005).of(group_1)
+    expect(subject[1]).to be_within(0.005).of(group_2)
+    expect(subject[2]).to be_within(0.005).of(group_3)
+    expect(subject[3]).to be_within(0.005).of(group_4)
   end
 end
