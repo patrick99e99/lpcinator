@@ -27,9 +27,7 @@ module LPCinator
       end
 
       print "."
-      p2 = perform_pitch_detection!
-      puts "#{sample_rate / p2}"
-      p2
+      perform_pitch_detection!
     end
 
   private
