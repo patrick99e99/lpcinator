@@ -24,7 +24,9 @@ module LPCinator
     end
 
     def frame_data
-      parameters_with_normalized_rms.each_with_index.map do |parameters, index|
+      LPCinator::RMSNormalizer.normalize!(parameters)
+
+      parameters.each_with_index.map do |parameters, index|
         pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[index])
 
         frame = LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
@@ -68,10 +70,6 @@ module LPCinator
         autocorrelation_coefficients = LPCinator::Autocorrelator.coefficients_for(segment)
         LPCinator::Reflector.translate(autocorrelation_coefficients, number_of_samples)
       end
-    end
-
-    def parameters_with_normalized_rms
-      @parameters_with_normalized_rms ||= LPCinator::RMSNormalizer.normalize!(parameters)
     end
 
     attr_reader :input, :options
