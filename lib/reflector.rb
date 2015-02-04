@@ -1,12 +1,21 @@
 module LPCinator
   class Reflector
     class Parameters
+      UNVOICED_THRESHOLD = 0.3
       attr_accessor :rms
       attr_reader :k
 
       def initialize(params)
         @k   = params.fetch(:k)
         @rms = params.fetch(:rms)
+      end
+
+      def voiced?
+        !unvoiced?
+      end
+
+      def unvoiced?
+        k[1] >= UNVOICED_THRESHOLD
       end
     end
 
