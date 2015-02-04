@@ -27,13 +27,13 @@ module LPCinator
     end
     
     def generate!
-      info = RubyAudio::SoundInfo.new(
+      file = LPCinator::Output.new(buffer, 
+        :path => output, 
+        :buffer => buffer,
         :channels => channels, 
-        :samplerate => sample_rate, 
-        :format => RubyAudio::FORMAT_WAV|RubyAudio::FORMAT_PCM_32,
+        :sample_rate => sample_rate, 
+        :format => format,
       )
-
-      file = LPCinator::Output.new(:path => output, :info => info, :buffer => buffer)
       file.write!
     end
 
@@ -51,6 +51,17 @@ module LPCinator
     end
 
   private
+
+    def format
+      case output.split('.').last 
+      when /wav/i
+        LPCinator::Output.wav_format
+      when /aif/i
+        LPCinator::Output.aif_format
+      else
+        raise 'unknown format!'
+      end
+    end
     
     def amplitude
       @amplitude / 100.0
