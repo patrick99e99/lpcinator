@@ -61,8 +61,8 @@ describe LPCinator::FrameDataBuilder do
     end
 
     context 'when the pitch is not zero' do
-      context 'and k1 is positive' do
-        before { ks[1] = 0.001 }
+      context 'and the reflection parameters consider it unvoiced' do
+        before { allow(parameters).to receive(:unvoiced?) { true } }
 
         it 'should be considered unvoiced' do
           expect(subject[:pitch]).to eq 0
