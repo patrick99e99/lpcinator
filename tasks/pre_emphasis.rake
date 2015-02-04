@@ -22,7 +22,7 @@ task :pre_emphasis do |args|
   processor  = LPCinator::PreEmphasis.new(buffer)
   processor.process!
 
-  output     = LPCinator::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
+  output     = LPCinator::Output.new(buffer, :path => options[:output], :info => input.info)
   output.write!
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)

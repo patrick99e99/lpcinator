@@ -17,19 +17,21 @@ task :downsample do |args|
 
   puts "generating downsampled version..."
 
-  start_time   = Time.now.to_f
+  start_time      = Time.now.to_f
 
-  input        = LPCinator::Input.new(options[:input])
-  buffer       = input.read
+  input           = LPCinator::Input.new(options[:input])
+  buffer          = input.read
 
   options[:sample_rate] ||= 8000
-  downsampled  = LPCinator::Downsampler.converted(buffer, options[:sample_rate])
+  downsampled     = LPCinator::Downsampler.converted(buffer, options[:sample_rate])
 
-  input.info.samplerate = options[:sample_rate]
-  output       = LPCinator::Output.new(:path => options[:output], :info => input.info, :buffer => downsampled)
+  info            = input.info.clone
+  info.samplerate = options[:sample_rate]
+
+  output          = LPCinator::Output.new(downsampled, :path => options[:output], :info => info)
   output.write!
 
-  seconds      = "%0.4f" % (Time.now.to_f - start_time)
+  seconds         = "%0.4f" % (Time.now.to_f - start_time)
 
   puts "Successfully processed #{input.info.frames} samples in #{seconds} seconds!"
 

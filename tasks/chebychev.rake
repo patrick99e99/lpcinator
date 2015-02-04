@@ -29,7 +29,7 @@ task :chebychev do |args|
 
   LPCinator::Chebychev.low_pass!(buffer, options[:cutoff].to_f, options[:time] || 0.1)
 
-  output     = LPCinator::Output.new(:path => options[:output], :info => input.info, :buffer => buffer)
+  output     = LPCinator::Output.new(buffer, :path => options[:output], :info => input.info)
   output.write!
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
