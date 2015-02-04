@@ -1,13 +1,15 @@
 module LPCinator
   class Chebychev < Bufferable
-    def self.low_pass!(buffer, cutoff, time)
-      new(buffer, cutoff, time).low_pass!
+    DEFAULT_TIME = 0.1
+
+    def self.low_pass!(buffer, cutoff_in_hz, options = {})
+      new(buffer, cutoff_in_hz, options).low_pass!
     end
 
-    def initialize(buffer, cutoff, time)
-      @buffer = buffer
-      @cutoff = cutoff
-      @time   = time
+    def initialize(buffer, cutoff_in_hz, options = {})
+      @buffer       = buffer
+      @cutoff_in_hz = cutoff_in_hz* 1000
+      @time         = options[:time] || DEFAULT_TIME
     end
 
     def low_pass!
@@ -27,15 +29,15 @@ module LPCinator
     end
 
     def alpha_1
-      @alpha_1 ||= 0.3572 * 2 * Math::PI * cutoff
+      @alpha_1 ||= 0.3572 * 2 * Math::PI * cutoff_in_hz
     end
 
     def alpha_2
-      @alpha_2 ||= 0.1786 * Math::PI * cutoff
+      @alpha_2 ||= 0.1786 * Math::PI * cutoff_in_hz
     end
 
     def beta
-      @beta ||= 0.8938 * Math::PI * cutoff
+      @beta ||= 0.8938 * Math::PI * cutoff_in_hz
     end
 
     def coefficient_1
@@ -58,7 +60,7 @@ module LPCinator
       -Math.exp(-2.0 * alpha_2 * time)
     end
 
-    attr_reader :cutoff, :time
+    attr_reader :cutoff_in_hz, :time
     attr_writer :filter
   end
 end

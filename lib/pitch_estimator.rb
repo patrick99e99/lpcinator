@@ -1,10 +1,9 @@
 module LPCinator
   class PitchEstimator < Bufferable
-    LOWPASS_CUTOFF_FREQUENCY = 0.8
-    LOWPASS_CUTOFF_TIME      = 0.1
-    MINIMUM_PITCH_IN_HZ      = 50.0
-    MAXIMUM_PITCH_IN_HZ      = 200.0
-    SUB_MULTIPLE_THRESHOLD   = 0.9
+    LOWPASS_CUTOFF_FREQUENCY_IN_HZ = 800
+    MINIMUM_PITCH_IN_HZ            = 50.0
+    MAXIMUM_PITCH_IN_HZ            = 200.0
+    SUB_MULTIPLE_THRESHOLD         = 0.9
 
     def self.pitch_for_period(buffer, pre_emphasized_buffer)
       new(buffer, pre_emphasized_buffer).pitch_for_period
@@ -16,9 +15,8 @@ module LPCinator
     end
 
     def pitch_for_period
-      LPCinator::Chebychev.low_pass!(buffer, 
-                                     LOWPASS_CUTOFF_FREQUENCY, 
-                                     LOWPASS_CUTOFF_TIME)
+      LPCinator::Chebychev.low_pass!(buffer, LOWPASS_CUTOFF_FREQUENCY_IN_HZ) 
+
       if energy_mismatch?
       end
 
@@ -54,6 +52,7 @@ module LPCinator
       found = false
 
       estimate = interpolated
+      return 0 if estimate.nan?
 
       while !found && maximum_multiple >= 1
         sub_multiples_are_strong = true
