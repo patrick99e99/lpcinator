@@ -2,7 +2,7 @@ module LPCinator
   class Segmenter < Bufferable
     def initialize(buffer, options)
       @buffer            = buffer
-      @number_of_samples = (buffer.sample_rate / 1000 * options.fetch(:size_in_milliseconds)).floor
+      @number_of_samples = (buffer.sample_rate / 1000 * options.fetch(:size_in_milliseconds)).ceil
       @window_size       = options[:window_size] || 1
     end
 
