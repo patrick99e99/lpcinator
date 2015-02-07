@@ -58,7 +58,7 @@ module LPCinator
       
       frame_data[:gain] = LPCinator::ParameterModifier.value_for(frame_data[:gain], target, { 
         min: MINIMUM_UNVOICED_GAIN_PARAMETER, 
-        max: LPCinator::RMSNormalizer.max_voiced_index,
+        max: LPCinator::RMSNormalizer.max_index,
       })
     end
   end
