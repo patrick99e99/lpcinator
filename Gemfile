@@ -7,4 +7,6 @@ gem 'coreaudio'
 group :test do
   gem 'rspec', :require => 'spec'
   gem 'pry'
+  gem 'pry-remote'
+  gem 'pry-nav'
 end
