@@ -30,7 +30,7 @@ module LPCinator
       [].tap do |frame_data|
         while !binary.length.zero?
           frame_data << {}.tap do |frame|
-            LPCinator::CodingTable::BITS.each do |key, value|
+            LPCinator::CodingTable.bits.each do |key, value|
               frame[key] = binary.slice!(0, value).to_i(2)
               break if frame[:gain]   == 0
               break if frame[:pitch]  == 0 && frame_has_exact_keys?(UNVOICED_FRAME_KEYS, frame)

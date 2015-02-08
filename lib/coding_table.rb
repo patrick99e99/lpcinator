@@ -28,5 +28,8 @@ module LPCinator
       PITCH
     end
 
+    def bits
+      BITS
+    end
   end
 end

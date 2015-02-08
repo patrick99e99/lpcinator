@@ -15,7 +15,9 @@ describe LPCinator::BitPacker do
   }
 
   before do
-    stub_const('LPCinator::CodingTable::BITS', { :gain => 4, :repeat => 1, :pitch => 5, :k1 => 5, :k2 => 5, :k3 => 4, :k4 => 4, :k5 => 4, :k6 => 4, :k7 => 4, :k8 => 3, :k9 => 3, :k10 => 3, })
+    allow(LPCinator::CodingTable).to receive(:bits) do
+      { :gain => 4, :repeat => 1, :pitch => 5, :k1 => 5, :k2 => 5, :k3 => 4, :k4 => 4, :k5 => 4, :k6 => 4, :k7 => 4, :k8 => 3, :k9 => 3, :k10 => 3, }
+    end
   end
 
   describe LPCinator::BitPacker do

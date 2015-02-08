@@ -5,7 +5,7 @@ module LPCinator::BitPacker
     def process(frame_data)
       frame_data.map do |frame|
         [].tap do |binary|
-          LPCinator::CodingTable::BITS.each do |parameter, bits|
+          LPCinator::CodingTable.bits.each do |parameter, bits|
             break if !frame[parameter]
             value = frame[parameter].to_s(2)
             left_zero_pad!(value, bits)
