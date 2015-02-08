@@ -14,11 +14,16 @@ module LPCinator
         frame_data[:repeat] = 0
         frame_data[:pitch]  = closest_pitch_match_for(pitch, parameters, translate)
         modify_gain_from_options!(frame_data, options)
+        modify_pitch_from_options!(frame_data, options)
 
         10.times do |t|
           k = t + 1
           break if k > 4 && frame_data[:pitch].zero?
           frame_data[key_for(k)] = closest_k_match_for(k, parameters.k[k], translate)
+        end
+
+        if parameters.unvoiced?
+          frame_data[:gain] = 6 if frame_data[:gain] > 6
         end
       end
     end
@@ -59,6 +64,18 @@ module LPCinator
       frame_data[:gain] = LPCinator::ParameterModifier.value_for(frame_data[:gain], target, { 
         min: MINIMUM_UNVOICED_GAIN_PARAMETER, 
         max: LPCinator::RMSNormalizer.max_index,
+      })
+    end
+
+    def modify_pitch_from_options!(frame_data, options)
+      pitch = frame_data[:pitch]
+      return if pitch.zero? || !options[:pitch]
+
+      target = options[:pitch]
+      
+      frame_data[:pitch] = LPCinator::ParameterModifier.value_for(pitch, target, { 
+        min: 1,
+        max: LPCinator::CodingTable.pitch.length - 1
       })
     end
   end

@@ -20,14 +20,14 @@ module LPCinator
     end
 
     def byte_stream
-      LPCinator::HexByteStreamer.translate(frame_data)
+      LPCinator::BitPacker.pack(frame_data)
     end
 
     def frame_data
       LPCinator::RMSNormalizer.normalize!(parameters)
 
       parameters.each_with_index.map do |parameters, index|
-        pitch = options[:whisper] ? 0 : (options[:pitch] ? options[:pitch].to_i : pitch_table[index])
+        pitch = options[:whisper] ? 0 : ((options[:pitch] && options[:pitch][0].to_i > 0) ? options[:pitch][0].to_i : pitch_table[index])
 
         frame = LPCinator::FrameDataBuilder.create_for(parameters, pitch, options)
         frame if (options[:unvoiced]  && frame[:pitch] && frame[:pitch].zero?)  ||
