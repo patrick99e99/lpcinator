@@ -7,6 +7,12 @@ task :decode do
     opts.on("-i", "--input {lpc}", "Input lpc file", String) do |file|
       options[:input] = file
     end
+    opts.on("--unvoiced-only", "unvoiced frames only", String) do 
+      options[:unvoiced] = true
+    end
+    opts.on("--voiced-only", "Voiced frames only", String) do 
+      options[:unvoiced] = true
+    end
     args = opts.order!(ARGV) {}
     opts.parse!(args)
   end

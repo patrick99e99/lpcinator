@@ -22,9 +22,9 @@ module LPCinator
           frame_data[key_for(k)] = closest_k_match_for(k, parameters.k[k], translate)
         end
 
-        if parameters.unvoiced?
-          frame_data[:gain] = 6 if frame_data[:gain] > 6
-        end
+#        if parameters.unvoiced?
+#          frame_data[:gain] = 6 if frame_data[:gain] > 6
+#        end
       end
     end
 
