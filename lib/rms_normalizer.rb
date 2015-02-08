@@ -7,7 +7,7 @@ module LPCinator
     end
 
     def self.max_index
-      LPCinator::CodingTable::RMS[0..PEAK_RMS_INDEX].length - 1
+      LPCinator::CodingTable.rms[0..PEAK_RMS_INDEX].length - 1
     end
 
     def initialize(parameters_for_all_frames)
@@ -23,7 +23,7 @@ module LPCinator
     private
 
     def ratio
-      @ratio ||= LPCinator::CodingTable::RMS[PEAK_RMS_INDEX].to_f / parameters_for_all_frames.max_by(&:rms).rms
+      @ratio ||= LPCinator::CodingTable.rms[PEAK_RMS_INDEX].to_f / parameters_for_all_frames.max_by(&:rms).rms
     end
 
     attr_reader :parameters_for_all_frames

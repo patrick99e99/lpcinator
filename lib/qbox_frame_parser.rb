@@ -4,7 +4,7 @@ module LPCinator
 
     def to_hex_byte_stream(file, options = {})
       frames = frames_for(file, options)
-      puts LPCinator::HexByteStreamer.translate(frames)
+      puts LPCinator::BitPacker.pack(frames)
     end
 
     def frames(file, options)
@@ -41,7 +41,7 @@ module LPCinator
       when :gain
         value = values[1]
         if options[:translate]
-          LPCinator::CodingTable::VALUES[:rms][value]
+          LPCinator::CodingTable.rms[value]
         else
           modified_value(value, options[:gain], 15)
         end
@@ -51,16 +51,16 @@ module LPCinator
         value = values[3]
         return unless value
         if options[:translate]
-          LPCinator::CodingTable::VALUES[:pitch][value]
+          LPCinator::CodingTable.pitch[value]
         else
           modified_value(value, options[:pitch], 63)
         end
       when /k(\d)/
-        index = $1.to_i - 1
-        value = values[4 + index]
+        bin = $1.to_i
+        value = values[3 + bin]
         return unless value
 
-        options[:translate] ? LPCinator::CodingTable::VALUES[:ks][index][value] : value
+        options[:translate] ? LPCinator::CodingTable.k_bin_for(bin)[value] : value
       end
     end
 
