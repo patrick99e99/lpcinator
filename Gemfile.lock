@@ -22,6 +22,7 @@ GEM
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
+    rake (10.4.2)
     rspec (3.1.0)
       rspec-core (~> 3.1.0)
       rspec-expectations (~> 3.1.0)
@@ -45,5 +46,6 @@ DEPENDENCIES
   pry
   pry-nav
   pry-remote
+  rake
   rspec
   ruby-audio!
