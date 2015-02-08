@@ -20,9 +20,15 @@ module LPCinator
         self.filter = coefficient_1 * buffer[t] + coefficient_2 * filter
         buffer[t]   = coefficient_3 * filter + coefficient_4 * last_buffer + coefficient_5 * buffer_before_last
       end
+
+      LPCinator::Normalizer.process!(buffer)
     end
 
   private
+
+    def scale_for(pre_energy, post_energy)
+      Math.sqrt(pre_energy / post_energy)
+    end
 
     def filter
       @filter || 0
