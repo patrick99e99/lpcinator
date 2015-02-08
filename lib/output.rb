@@ -8,6 +8,10 @@ module LPCinator
       RubyAudio::FORMAT_WAV|RubyAudio::FORMAT_PCM_16
     end
 
+    def self.write!(buffer, options)
+      new(buffer, options).write!
+    end
+
     def initialize(buffer, options)
       @sound  = RubyAudio::Sound.open(options.fetch(:path), 'w', info_with_defaults(options))
       @buffer = buffer

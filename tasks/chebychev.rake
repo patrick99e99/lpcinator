@@ -1,8 +1,7 @@
 desc 'low pass filter'
-task :chebychev do |args|
+task :chebychev do 
   options = {}
-
-  OptionParser.new(args) do |opts|
+  OptionParser.new do |opts|
     opts.banner = "Usage: rake generate [options]"
     opts.on("-i", "--input {audiofile}", "Input audio file", String) do |file|
       options[:input] = file
@@ -18,19 +17,21 @@ task :chebychev do |args|
     opts.on("-t", "--time {time}", "Sample period in milliseconds", String) do |time|
       options[:time] = time
     end
-  end.parse!
 
-  puts "low pass filtering with a cutoff of #{options[:cutoff]}..."
+    args = opts.order!(ARGV) {}
+    opts.parse!(args)
+  end
+
+  puts "low pass filtering with a cutoff of #{options[:cutoff]} hz..."
 
   start_time = Time.now.to_f
 
-  input      = LPCinator::Input.new(:path => options[:input])
+  input      = LPCinator::Input.new(options[:input])
   buffer     = input.read
 
-  LPCinator::Chebychev.low_pass!(buffer, options[:cutoff].to_f, options[:time] || 0.1)
+  LPCinator::Chebychev.low_pass!(buffer, options[:cutoff].to_f, { :time => options[:time] })
 
-  output     = LPCinator::Output.new(buffer, :path => options[:output], :info => input.info)
-  output.write!
+  LPCinator::Output.write!(buffer, :path => options[:output], :info => input.info.clone)
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 

@@ -1,8 +1,8 @@
 desc 'generate hex byte stream from QboxPro frame data'
-task :qbox do |args|
+task :qbox do
   options = {}
 
-  OptionParser.new(args) do |opts|
+  OptionParser.new do |opts|
     opts.banner = "Usage: rake generate [options]"
     opts.on("-i", "--input {qbox frame file}", "Input qbox frame file", String) do |file|
       options[:input] = file
@@ -19,7 +19,9 @@ task :qbox do |args|
     opts.on("-t", "--translate", "Translate parameters", String) do |translate|
       options[:translate] = true
     end
-  end.parse!
+    args = opts.order!(ARGV) {}
+    opts.parse!(args)
+  end
 
   puts "generating LPC data..."
 

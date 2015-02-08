@@ -8,7 +8,7 @@ module LPCinator
 
     def initialize(buffer, cutoff_in_hz, options = {})
       @buffer       = buffer
-      @cutoff_in_hz = cutoff_in_hz* 1000
+      @cutoff_in_hz = cutoff_in_hz / 1000.0
       @time         = options[:time] || DEFAULT_TIME
     end
 

@@ -2,7 +2,7 @@ desc 'generate test waveform wav file'
 task :waveform do |args|
   options = {}
 
-  OptionParser.new(args) do |opts|
+  OptionParser.new do |opts|
     opts.banner = "Usage: rake test_waveform [options]"
     [
       { :output => "Output file for test waveform" },
@@ -23,7 +23,9 @@ task :waveform do |args|
         end
       end
     end
-  end.parse!
+    args = opts.order!(ARGV) {}
+    opts.parse!(args)
+  end
 
   start_time = Time.now.to_f
   waveform = LPCinator::Waveform.new(options)

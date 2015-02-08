@@ -1,8 +1,8 @@
 desc 'pre emphasis filter'
-task :pre_emphasis do |args|
+task :pre_emphasis do 
   options = {}
 
-  OptionParser.new(args) do |opts|
+  OptionParser.new do |opts|
     opts.banner = "Usage: rake generate [options]"
     opts.on("-i", "--input {audiofile}", "Input audio file", String) do |file|
       options[:input] = file
@@ -10,20 +10,21 @@ task :pre_emphasis do |args|
     opts.on("-o", "--output {audiofile}", "Output audio file", String) do |file|
       options[:output] = file
     end
-  end.parse!
+    args = opts.order!(ARGV) {}
+    opts.parse!(args)
+  end
 
   puts "generating pre emphasis file..."
 
   start_time = Time.now.to_f
 
-  input      = LPCinator::Input.new(:path => options[:input])
+  input      = LPCinator::Input.new(options[:input])
   buffer     = input.read
 
   processor  = LPCinator::PreEmphasis.new(buffer)
   processor.process!
 
-  output     = LPCinator::Output.new(buffer, :path => options[:output], :info => input.info)
-  output.write!
+  LPCinator::Output.write!(buffer, :path => options[:output], :info => input.info.clone)
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 
