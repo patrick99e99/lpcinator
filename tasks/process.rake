@@ -1,8 +1,8 @@
 desc 'generates frame data and hex LPC for TMS5220'
 namespace :process do
-  def parse_options(args)
+  def parse_options
     {}.tap do |options|
-      OptionParser.new(args) do |opts|
+      OptionParser.new do |opts|
         opts.banner = "Usage: rake generate [options]"
         opts.on("-i", "--input {audiofile}", "Input audio file", String) do |file|
           options[:input] = file
@@ -45,12 +45,15 @@ namespace :process do
         end
 
         yield opts if block_given?
-      end.parse!
+
+        args = opts.order!(ARGV) {}
+        opts.parse!(args)
+      end
     end
   end
 
-  task :byte_stream do |args|
-    options = parse_options(args)
+  task :byte_stream do 
+    options = parse_options
 
     print "generating LPC hex byte stream"
 
@@ -65,8 +68,8 @@ namespace :process do
     exit 0
   end
 
-  task :frame_data do |args|
-    options = parse_options(args) do |opts|
+  task :frame_data do 
+    options = parse_options do |opts|
       opts.on("-w", "--whisper", "Whisper speech", String) do |whisper|
         options[:whisper] = true
       end
