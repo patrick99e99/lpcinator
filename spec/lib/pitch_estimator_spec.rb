@@ -18,16 +18,6 @@ describe LPCinator::PitchEstimator do
       allow(buffer).to receive(:energy)                { energy }
     end
 
-    context 'when the energy requirements are not met' do
-      let(:pre_emphasized_energy) { 100 }
-      let(:energy)                { 40 }
-
-      it 'is unvoiced' do
-        pending
-        expect(subject).to be_zero
-      end
-    end
-
     context 'when the energy requirements are met' do
       it 'returns the pitch period in samples' do
         expect(subject).to be_within(67).of(0.5)

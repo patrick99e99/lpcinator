@@ -1,6 +1,7 @@
 module LPCinator
   class Processor
-    DEFAULT_FRAME_SIZE = 25
+    DEFAULT_FRAME_SIZE  = 25
+    DEFAULT_SAMPLE_RATE = 8000
 
     def self.byte_stream(path, options = {})
       puts
@@ -45,22 +46,32 @@ module LPCinator
       end
     end
 
-    def pre_emphasized_buffer
-      @pre_emphasized_buffer ||= begin
-        input.read.tap { |buffer| LPCinator::PreEmphasis.process!(buffer) }
+    def pre_emphasized_segmenter
+      @pre_emphasized_segmenter ||= begin
+        buffer = original_buffer
+        LPCinator::PreEmphasis.process!(buffer) 
+        LPCinator::Segmenter.new(buffer, size_in_milliseconds: frame_size)
       end
     end
 
-    def pre_emphasized_segmenter
-      @pre_emphasized_segmenter ||= LPCinator::Segmenter.new(pre_emphasized_buffer, size_in_milliseconds: frame_size)
+    def pitch_segmenter
+      @pitch_segmenter ||= LPCinator::Segmenter.new(original_buffer, size_in_milliseconds: frame_size, window_size: 2)
     end
 
-    def pitch_segmenter
-      @pitch_segmenter ||= LPCinator::Segmenter.new(input.read, size_in_milliseconds: frame_size, window_size: 2)
+    def original_buffer
+      if input.sample_rate != sample_rate
+        LPCinator::Downsampler.converted(input.read, sample_rate)
+      else
+        input.read
+      end
     end
 
     def frame_size
-      (options[:frame_size] && options[:frame_size].to_i) || DEFAULT_FRAME_SIZE 
+      @frame_size ||= (options[:frame_size] && options[:frame_size].to_i) || DEFAULT_FRAME_SIZE 
+    end
+
+    def sample_rate
+      @sample_rate ||= (options[:sample_rate] && options[:sample_rate].to_f) || DEFAULT_SAMPLE_RATE
     end
 
     def parameters

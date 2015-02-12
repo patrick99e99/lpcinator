@@ -3,6 +3,7 @@ module LPCinator
     extend self
 
     MINIMUM_UNVOICED_GAIN_PARAMETER = 2
+    MAXIMUM_UNVOICED_GAIN_PARAMETER = 6
 
     def create_for(parameters, pitch, options = {})
       {}.tap do |frame_data|
@@ -10,6 +11,7 @@ module LPCinator
 
         frame_data[:gain] = closest_gain_match_for(parameters.rms, translate)
         next if frame_data[:gain].zero?
+        limit_unvoiced_gain!(frame_data) if parameters.unvoiced?
 
         frame_data[:repeat] = 0
         frame_data[:pitch]  = closest_pitch_match_for(pitch, parameters, translate)
@@ -21,10 +23,6 @@ module LPCinator
           break if k > 4 && frame_data[:pitch].zero?
           frame_data[key_for(k)] = closest_k_match_for(k, parameters.k[k], translate)
         end
-
-#        if parameters.unvoiced?
-#          frame_data[:gain] = 6 if frame_data[:gain] > 6
-#        end
       end
     end
 
@@ -48,6 +46,10 @@ module LPCinator
     def closest_k_match_for(k, actual, translate)
       values = LPCinator::CodingTable.k_bin_for(k)
       LPCinator::ClosestValueFinder.index_or_translated_value(actual, values, translate)
+    end
+
+    def limit_unvoiced_gain!(frame_data)
+      frame_data[:gain] = MAXIMUM_UNVOICED_GAIN_PARAMETER if frame_data[:gain] > MAXIMUM_UNVOICED_GAIN_PARAMETER
     end
 
     def modify_gain_from_options!(frame_data, options)

@@ -1,5 +1,5 @@
 desc 'generate hex byte stream from QboxPro frame data'
-task :qbox do
+task :import do
   options = {}
 
   OptionParser.new do |opts|
@@ -27,7 +27,7 @@ task :qbox do
 
   start_time = Time.now.to_f
 
-  LPCinator::QboxFrameParser.to_hex_byte_stream options[:input], options
+  LPCinator::FrameParser.to_hex_byte_stream options[:input], options
 
   seconds    = "%0.4f" % (Time.now.to_f - start_time)
 

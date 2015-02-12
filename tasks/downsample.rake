@@ -29,7 +29,9 @@ task :downsample do
   input           = LPCinator::Input.new(options[:input])
   buffer          = input.read
 
-  downsampled     = LPCinator::Downsampler.converted(buffer, options[:sample_rate], { :cutoff_in_hz => options[:cutoff] })
+  cutoff          = options[:cutoff].to_f if options[:cutoff]
+
+  downsampled     = LPCinator::Downsampler.converted(buffer, options[:sample_rate], { :cutoff_in_hz => cutoff })
 
   info            = input.info.clone
   info.channels   = 1

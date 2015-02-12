@@ -7,9 +7,10 @@ module LPCinator
     end
 
     def initialize(buffer, cutoff_in_hz, options = {})
-      @buffer       = buffer
-      @cutoff_in_hz = cutoff_in_hz / 1000.0
-      @time         = options[:time] || DEFAULT_TIME
+      @buffer         = buffer
+      @cutoff_in_hz   = cutoff_in_hz / 1000.0
+      @time           = options[:time] || DEFAULT_TIME
+      @skip_normalize = options[:skip_normalize]
     end
 
     def low_pass!
@@ -21,14 +22,10 @@ module LPCinator
         buffer[t]   = coefficient_3 * filter + coefficient_4 * last_buffer + coefficient_5 * buffer_before_last
       end
 
-      LPCinator::Normalizer.process!(buffer)
+      LPCinator::Normalizer.process!(buffer) if should_normalize?
     end
 
   private
-
-    def scale_for(pre_energy, post_energy)
-      Math.sqrt(pre_energy / post_energy)
-    end
 
     def filter
       @filter || 0
@@ -64,6 +61,10 @@ module LPCinator
 
     def coefficient_5
       -Math.exp(-2.0 * alpha_2 * time)
+    end
+
+    def should_normalize?
+      !@skip_normalize
     end
 
     attr_reader :cutoff_in_hz, :time

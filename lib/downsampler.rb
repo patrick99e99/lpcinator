@@ -6,28 +6,25 @@ module LPCinator
     end
 
     def initialize(buffer, target_sample_rate, options = {})
-      LPCinator::Chebychev.low_pass!(buffer, options[:cutoff_in_hz] && options[:cutoff_in_hz].to_f || target_sample_rate.to_f / 2)
       super(buffer)
       @target_sample_rate = target_sample_rate
+      @cutoff_in_hz       = options[:cutoff_in_hz] || target_sample_rate / 2.0
     end
 
     def converted
       LPCinator::Buffer.new(downsampled_number_of_samples, target_sample_rate).tap do |downsampled|
         counter = 0
         index   = 0
-        last_whole_part = nil
 
         number_of_samples.times do 
           counter += ratio
           whole_part    = counter.floor
           fraction_part = counter - whole_part
 
-          break if !buffer[whole_part + 1]
-          if last_whole_part != whole_part
-            downsampled[index] = (1.0 - fraction_part) * buffer[whole_part] + fraction_part * buffer[whole_part + 1]
-            last_whole_part = whole_part
-            index += 1
-          end
+          break if !low_passed[whole_part + 1]
+          downsampled[index] = (1.0 - fraction_part) * low_passed[whole_part] + fraction_part * low_passed[whole_part + 1]
+          last_whole_part = whole_part
+          index += 1
         end
 
         LPCinator::Normalizer.process!(downsampled)
@@ -44,7 +41,12 @@ module LPCinator
       @downsampled_number_of_samples ||= (number_of_samples / ratio).ceil
     end
 
-    attr_reader :target_sample_rate
+    def low_passed
+      @low_passed ||= buffer.dup.tap do |low_passed|
+        LPCinator::Chebychev.low_pass!(low_passed, cutoff_in_hz, { :time => 0.1 })
+      end
+    end
 
+    attr_reader :target_sample_rate, :cutoff_in_hz
   end
 end

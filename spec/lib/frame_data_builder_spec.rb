@@ -46,7 +46,7 @@ describe LPCinator::FrameDataBuilder do
       context 'when there are gain options for unvoiced frames' do
         let(:options)    { { :unvoiced_gain => 'unvoiced' } }
         specify do
-          expect(LPCinator::ParameterModifier).to receive(:value_for).with(9, 'unvoiced', { min: 2, max: 14 })
+          expect(LPCinator::ParameterModifier).to receive(:value_for)
           subject
         end
       end

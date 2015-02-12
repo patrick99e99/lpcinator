@@ -1,5 +1,5 @@
 module LPCinator
-  module QboxFrameParser
+  module FrameParser
     extend self
 
     def to_hex_byte_stream(file, options = {})
@@ -19,7 +19,7 @@ module LPCinator
       [].tap do |frames|
         lines = []
         file.each_line do |line|
-          lines << line unless line.strip.length.zero? || !!(line =~ /[a-z*;]/i)
+          lines << line if !line.strip.length.zero? && line =~ /^\s*?\d+/
         end
         
         lines.compact.each_with_index do |line, index|
@@ -30,7 +30,7 @@ module LPCinator
             frame[key] = value if value
           end
 
-          puts "#{frame},"
+          puts "#{index}: #{frame},"
           frames << frame
         end
       end
@@ -43,7 +43,10 @@ module LPCinator
         if options[:translate]
           LPCinator::CodingTable.rms[value]
         else
-          modified_value(value, options[:gain], 15)
+          LPCinator::ParameterModifier.value_for(value, options[:gain], { 
+            min: 1,
+            max: 15,
+          })
         end
       when :repeat
         values[2] if values[2]
@@ -53,7 +56,10 @@ module LPCinator
         if options[:translate]
           LPCinator::CodingTable.pitch[value]
         else
-          modified_value(value, options[:pitch], 63)
+          LPCinator::ParameterModifier.value_for(value, options[:pitch], { 
+            min: 1,
+            max: 63,
+          })
         end
       when /k(\d)/
         bin = $1.to_i
@@ -62,21 +68,6 @@ module LPCinator
 
         options[:translate] ? LPCinator::CodingTable.k_bin_for(bin)[value] : value
       end
-    end
-
-    def modified_value(value, optional, max)
-      return value unless optional
-      override = optional.to_i.abs
-
-      if /\+/ =~ optional
-        value += override
-      elsif /-/ =~ optional
-        value -= override
-      else
-        value = override
-      end
-
-      value > max ? max : value
     end
   end
 end

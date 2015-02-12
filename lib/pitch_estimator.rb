@@ -15,24 +15,16 @@ module LPCinator
     end
 
     def pitch_for_period
-      LPCinator::Chebychev.low_pass!(buffer, LOWPASS_CUTOFF_FREQUENCY_IN_HZ) 
+      pre_energy = buffer.energy
+      LPCinator::Chebychev.low_pass!(buffer, LOWPASS_CUTOFF_FREQUENCY_IN_HZ, :skip_normalize => true)
 
-      if energy_mismatch?
-      end
-
-      if out_of_range?
-        return 0
-      end
+      return 0 if out_of_range?
 
       print "."
       perform_pitch_detection!
     end
 
   private
-
-    def energy_mismatch?
-      pre_emphasized_buffer.energy > buffer.energy
-    end
 
     def out_of_range?
       normalized[best_period_index] < normalized[best_period_index - 1] &&
