@@ -2,7 +2,7 @@ require 'bit_packer/helpers'
 
 module LPCinator
   module BitPacker
-    extend self
+    extend self, Helpers
 
     UNVOICED_FRAME_KEYS = [:gain, :repeat, :pitch, :k1, :k2, :k3, :k4]
     REPEAT_FRAME_KEYS   = [:gain, :repeat, :pitch]
@@ -31,6 +31,8 @@ module LPCinator
         while !binary.length.zero?
           frame_data << {}.tap do |frame|
             LPCinator::CodingTable.bits.each do |key, value|
+              right_zero_pad!(binary, value)
+
               frame[key] = binary.slice!(0, value).to_i(2)
               break if frame[:gain]   == 0
               break if frame[:pitch]  == 0 && frame_has_exact_keys?(UNVOICED_FRAME_KEYS, frame)
