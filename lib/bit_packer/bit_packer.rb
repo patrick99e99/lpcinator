@@ -31,9 +31,8 @@ module LPCinator
         while !binary.length.zero?
           frame_data << {}.tap do |frame|
             LPCinator::CodingTable.bits.each do |key, value|
-              right_zero_pad!(binary, value)
-
-              frame[key] = binary.slice!(0, value).to_i(2)
+              shift = binary.length < value ? (value - binary.length) : 0
+              frame[key] = binary.slice!(0, value).to_i(2) << shift
               break if frame[:gain]   == 0
               break if frame[:pitch]  == 0 && frame_has_exact_keys?(UNVOICED_FRAME_KEYS, frame)
               break if frame[:repeat] == 1 && frame_has_exact_keys?(REPEAT_FRAME_KEYS, frame)
