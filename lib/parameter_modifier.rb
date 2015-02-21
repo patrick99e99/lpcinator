@@ -2,6 +2,7 @@ module LPCinator
   class ParameterModifier
 
     def self.value_for(original, target, options)
+      return original unless target
       new(original, target, options).return_value
     end
 

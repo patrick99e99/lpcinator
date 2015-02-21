@@ -23,7 +23,7 @@ module LPCinator
         end
         
         lines.compact.each_with_index do |line, index|
-          values = line.scan(/\d+/).map(&:to_i)
+          values = line.scan(/\b\d+/).map(&:to_i)
           frame  = {}
           [:gain, :repeat, :pitch, :k1, :k2, :k3, :k4, :k5, :k6, :k7, :k8, :k9, :k10].each do |key|
             value = value_for(key, values, options)
@@ -61,7 +61,7 @@ module LPCinator
             max: 63,
           })
         end
-      when /k(\d)/
+      when /k(\d+)/
         bin = $1.to_i
         value = values[3 + bin]
         return unless value
